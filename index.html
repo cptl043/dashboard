@@ -1,0 +1,1644 @@
+<!DOCTYPE html>
+<!-- Capital Dashboard v20260503_133212 - FIXED -->
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Capital — Dashboard</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+
+:root {
+  /* ── Mockup palette ───────────────────────── */
+  --navy:  #0D1B2A; --navy2: #152234; --navy3: #1E3048;
+  --gold:  #C9A84C; --gold2: #E8C97A; --gold3: #F5E4B0;
+  --cream: #F7F3EC; --cream2:#EDE6D8; --cream3:#E0D8C8;
+  --bg:    #F0EBE1; --bg2:  #F7F3EC; --bg3:  #EDE6D8; --bg4:  #E0D8C8;
+  --card:  #FFFFFF;
+  --border: rgba(13,27,42,0.07); --border2: rgba(13,27,42,0.13);
+  --text:  #0D1B2A; --text2: #4A5568; --text3: #7A7A6E;
+  --muted: #7A7A6E;
+  /* ── Semantic colours (keeping omzet-dashboard names) ── */
+  --green: #1D9E75; --green2: #E1F5EE; --green3: #085041;
+  --red:   #C94C4C; --red2:  #FCEBEB;
+  --amber: #E8913A; --amber2:#FEF3E8;
+  --blue:  #2D5A9E; --blue2: #E6F1FB;
+  --purple:#6B4FCF; --purple2:#F0EDFF;
+  --teal:  #1D9E75;
+  --radius: 12px; --radius-lg: 16px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 13px;
+  line-height: 1.5;
+  min-height: 100vh;
+}
+
+/* ── TOP NAV (premium mockup style, replaces dark sidebar) ── */
+.topnav {
+  background: var(--navy);
+  padding: 0 28px;
+  display: flex; align-items: center; justify-content: space-between;
+  height: 58px; position: sticky; top: 0; z-index: 200;
+  border-bottom: 1px solid rgba(201,168,76,.15);
+}
+.nav-logo { font-family:'Playfair Display',serif; color:var(--gold); font-size:22px; letter-spacing:2px; }
+.nav-sep { width:1px; height:24px; background:rgba(13,27,42,.08); margin:0 16px; }
+.nav-sub { color:rgba(255,255,255,.3); font-size:10px; letter-spacing:3px; text-transform:uppercase; }
+.nav-r { display:flex; align-items:center; gap:12px; }
+.nav-date { color:rgba(255,255,255,.38); font-size:11px; }
+.nav-pill { background:rgba(201,168,76,.12); border:1px solid rgba(201,168,76,.25); color:var(--gold2); font-size:9px; padding:4px 10px; border-radius:20px; letter-spacing:1.5px; text-transform:uppercase; }
+.nav-add-btn { background:rgba(201,168,76,.15); border:1px solid rgba(201,168,76,.3); color:var(--gold2); font-size:11px; font-family:inherit; font-weight:500; padding:6px 14px; border-radius:8px; cursor:pointer; display:flex; align-items:center; gap:6px; transition:all .15s; }
+.nav-add-btn:hover { background:rgba(201,168,76,.25); }
+
+/* ── TAB BAR ─────────────────────────────────────────── */
+.tabbar { background:var(--navy2); display:flex; padding:0 28px; overflow-x:auto; scrollbar-width:none; border-bottom:1px solid rgba(13,27,42,.04); }
+.tabbar::-webkit-scrollbar { display:none; }
+.tabitem { padding:12px 18px; color:rgba(255,255,255,.35); font-size:11px; font-weight:500; cursor:pointer; border-bottom:2px solid transparent; white-space:nowrap; transition:all .2s; letter-spacing:.5px; text-transform:uppercase; }
+.tabitem:hover { color:rgba(255,255,255,.65); }
+.tabitem.active { color:var(--gold); border-bottom-color:var(--gold); }
+
+
+  /* ── YEAR BADGES (light theme) ───────────────── */
+  .yr-badge { display:inline-flex; align-items:center; padding:1px 7px; border-radius:4px; font-size:10px; font-weight:600; font-family:'DM Mono',monospace; letter-spacing:.3px; vertical-align:middle; margin:0 2px; }
+  .yr-2020 { background:rgba(232,145,58,.12); color:#8a4800; border:1px solid rgba(232,145,58,.3); }
+  .yr-2021 { background:rgba(201,168,76,.12); color:#7a5c00; border:1px solid rgba(201,168,76,.3); }
+  .yr-2022 { background:rgba(29,158,117,.12); color:#085041; border:1px solid rgba(29,158,117,.3); }
+  .yr-2023 { background:rgba(107,79,207,.12); color:#4a2faa; border:1px solid rgba(107,79,207,.3); }
+  .yr-2024 { background:rgba(232,145,58,.12); color:#8a4800; border:1px solid rgba(232,145,58,.3); }
+  .yr-2025 { background:rgba(45,90,158,.12); color:#1a3a7a; border:1px solid rgba(45,90,158,.3); }
+  .yr-2026 { background:rgba(13,27,42,.1); color:var(--navy); border:1px solid rgba(13,27,42,.2); }
+  .yr-2027 { background:rgba(29,158,117,.12); color:#085041; border:1px solid rgba(29,158,117,.3); }
+
+
+/* ── MAIN CONTENT ──────────────────────────────────────── */
+.main { max-width: 1300px; margin: 0 auto; padding: 22px 20px; }
+.page { display: none; }
+.page.active { display: block; animation: fi .25s ease; }
+@keyframes fi { from { opacity:0; transform:translateY(5px) } to { opacity:1; transform:translateY(0) } }
+
+/* ── PAGE HEADER ───────────────────────────────────── */
+.page-header { display:flex; align-items:flex-end; justify-content:space-between; margin-bottom:18px; }
+.page-title { font-family:'Playfair Display',serif; font-size:24px; color:var(--navy); letter-spacing:-.3px; }
+.page-sub { font-size:11px; color:var(--muted); margin-top:3px; }
+.header-controls { display:flex; gap:6px; }
+
+/* ── FILTER PILLS ─────────────────────────────────── */
+.pills { display:flex; gap:5px; flex-wrap:wrap; margin-bottom:14px; }
+.pill {
+  padding: 5px 13px; border-radius: 20px;
+  border: 1px solid var(--border2); color: var(--muted);
+  font-size: 11px; cursor: pointer; transition: all .12s;
+  background: white; font-family: inherit;
+}
+.pill:hover { border-color: var(--navy); color: var(--navy); }
+.pill.active { background: var(--navy); color: white; border-color: var(--navy); }
+
+/* ── METRIC CARDS ─────────────────────────────────── */
+.metrics { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:18px; }
+.metric-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 18px 20px;
+  position: relative; overflow: hidden;
+  transition: box-shadow .2s;
+}
+.metric-card:hover { box-shadow: 0 6px 24px rgba(13,27,42,.07); }
+.metric-card::before { content:''; position:absolute; top:0; left:0; width:3px; height:100%; background:var(--gold); }
+.metric-card.hi::before { background: var(--green); }
+.metric-card.lo::before { background: var(--red); }
+.metric-card.warn::before { background: var(--amber); }
+.metric-card.info::before { background: var(--blue); }
+.mc-label { font-size:9px; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:1.2px; margin-bottom:8px; }
+.mc-value { font-family:'Playfair Display',serif; font-size:26px; color:var(--navy); line-height:1; margin-bottom:4px; }
+.mc-sub { font-size:10px; color:var(--muted); }
+.mc-sub.up { color: var(--green); font-weight:600; }
+.mc-sub.dn { color: var(--red); font-weight:600; }
+
+/* ── PANELS / CARDS ───────────────────────────────── */
+.panels { display:grid; gap:14px; margin-bottom:14px; }
+.panels-2, .p2 { grid-template-columns:1fr 1fr; }
+.panels-3 { grid-template-columns:2fr 1fr; }
+@media(max-width:800px) { .panels-2, .p2, .panels-3 { grid-template-columns:1fr; } }
+.panel {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 20px 22px;
+  margin-bottom: 0; transition: box-shadow .2s;
+}
+.panel:hover { box-shadow: 0 4px 20px rgba(13,27,42,.06); }
+.panel-title {
+  font-size:10px; font-weight:600; color:var(--muted);
+  text-transform:uppercase; letter-spacing:1px; margin-bottom:14px;
+  display:flex; align-items:center; justify-content:space-between;
+}
+.panel-head { font-family:'Playfair Display',serif; font-size:17px; color:var(--navy); margin-bottom:4px; }
+.ch { position:relative; width:100%; }
+.legend { display:flex; gap:12px; flex-wrap:wrap; font-size:11px; color:var(--muted); margin-bottom:10px; }
+.leg-item { display:flex; align-items:center; gap:5px; }
+.leg-dot { width:8px; height:8px; border-radius:2px; flex-shrink:0; }
+.leg-line { width:14px; height:0; border-top:2px dashed; flex-shrink:0; }
+
+/* ── TABLES ───────────────────────────────────────── */
+.data-table { width:100%; border-collapse:collapse; font-size:12px; }
+.data-table th { font-size:9px; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:.8px; padding:7px 10px; text-align:left; border-bottom:2px solid var(--border); }
+.data-table td { padding:8px 10px; border-bottom:1px solid var(--border); color:var(--text2); }
+.data-table tr:last-child td { border-bottom:none; }
+.data-table tr:hover td { background:var(--cream); color:var(--text); }
+.data-table .val { font-family:'DM Mono',monospace; color:var(--navy); font-weight:500; text-align:right; }
+.data-table .up { color:var(--green); font-weight:600; }
+.data-table .dn { color:var(--red); font-weight:600; }
+
+/* ── BADGES ──────────────────────────────────────── */
+.badge { font-size:9px; padding:2px 7px; border-radius:4px; display:inline-block; white-space:nowrap; font-weight:600; }
+.badge-feast { background:rgba(45,90,158,.1); color:var(--blue); }
+.badge-vak { background:rgba(29,158,117,.1); color:var(--green); }
+.badge-warn { background:rgba(232,145,58,.1); color:var(--amber); }
+
+/* ── BAR ROWS ────────────────────────────────────── */
+.bar-row { display:flex; align-items:center; gap:8px; padding:6px 0; border-bottom:1px solid var(--border); font-size:11px; }
+.bar-row:last-child { border-bottom:none; }
+.br-rank { min-width:18px; color:var(--muted); text-align:right; font-size:10px; }
+.br-label { min-width:110px; color:var(--text2); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:10px; }
+.br-track { flex:1; background:var(--cream2); border-radius:3px; height:12px; overflow:hidden; }
+.br-fill { height:100%; border-radius:3px; transition:width .4s ease; }
+.br-val { min-width:68px; text-align:right; font-family:'DM Mono',monospace; font-weight:500; color:var(--navy); font-size:11px; }
+
+/* ── HI/LO CARDS ─────────────────────────────────── */
+.hl-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px; }
+.hl-card { border-radius:var(--radius); padding:14px 16px; }
+.hl-hi { background:rgba(29,158,117,.07); border:1px solid rgba(29,158,117,.2); }
+.hl-lo { background:rgba(201,76,76,.07); border:1px solid rgba(201,76,76,.2); }
+.hl-label { font-size:9px; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:6px; }
+.hl-val { font-family:'Playfair Display',serif; font-size:22px; }
+.hl-hi .hl-val { color: var(--green); }
+.hl-lo .hl-val { color: var(--red); }
+.hl-date { font-size:10px; color:var(--muted); margin-top:3px; }
+
+/* ── FORECAST BAR ────────────────────────────────── */
+.forecast-bar { display:flex; align-items:center; gap:8px; padding:4px 0; font-size:11px; }
+.fb-day { min-width:80px; color:var(--text2); font-size:10px; }
+.fb-track { flex:1; background:var(--cream2); border-radius:3px; height:14px; overflow:hidden; position:relative; }
+.fb-expected { height:100%; background:rgba(45,90,158,.2); border-radius:3px; }
+.fb-actual { position:absolute; top:0; height:100%; background:var(--blue); border-radius:3px; opacity:.85; }
+.fb-val { min-width:70px; text-align:right; font-family:'DM Mono',monospace; font-size:11px; }
+
+/* ── NOTIFICATION DOT ────────────────────────────── */
+.notif { width:6px; height:6px; border-radius:50%; background:var(--red); display:inline-block; margin-left:4px; vertical-align:middle; }
+
+/* ── MODAL ──────────────────────────────────────── */
+.modal-overlay { display:none; position:fixed; inset:0; background:rgba(13,27,42,.6); z-index:200; align-items:center; justify-content:center; }
+.modal-overlay.open { display:flex; }
+.modal { background:white; border:1px solid var(--border2); border-radius:var(--radius-lg); padding:28px; width:460px; max-width:95vw; box-shadow:0 20px 60px rgba(13,27,42,.15); }
+.modal h3 { font-family:'Playfair Display',serif; font-size:18px; color:var(--navy); margin-bottom:5px; }
+.modal .desc { font-size:11px; color:var(--muted); margin-bottom:16px; }
+.modal select, .modal textarea, .modal input {
+  width:100%; background:var(--cream); border:1px solid var(--border2);
+  border-radius:var(--radius); color:var(--text); font-family:inherit;
+  padding:9px 12px; font-size:12px; margin-bottom:8px;
+}
+.modal select:focus, .modal textarea:focus, .modal input:focus { outline:none; border-color:var(--navy); }
+.modal textarea { font-family:'DM Mono',monospace; font-size:11px; height:140px; resize:vertical; }
+.modal-btns { display:flex; gap:8px; justify-content:flex-end; margin-top:10px; }
+.btn { padding:8px 18px; border-radius:var(--radius); font-family:inherit; font-size:12px; font-weight:500; cursor:pointer; transition:all .12s; border:none; }
+.btn-primary { background:var(--navy); color:white; }
+.btn-primary:hover { background:var(--navy3); }
+.btn-ghost { background:var(--cream); color:var(--muted); border:1px solid var(--border2); }
+.btn-ghost:hover { color:var(--text); }
+.modal-err { font-size:11px; color:var(--red); margin-top:4px; display:none; }
+
+/* ── DAY LOG ─────────────────────────────────────── */
+.daylog-row { display:grid; grid-template-columns:120px 1fr 90px 80px 80px 60px; gap:8px; align-items:center; padding:6px 10px; border-radius:8px; font-size:11px; }
+.daylog-row:hover { background:var(--cream); }
+.daylog-row.conflict { background:rgba(201,76,76,.05); border:1px solid rgba(201,76,76,.15); }
+
+/* ── SCROLLBAR ───────────────────────────────────── */
+::-webkit-scrollbar { width:5px; }
+::-webkit-scrollbar-track { background:transparent; }
+::-webkit-scrollbar-thumb { background:var(--cream3); border-radius:3px; }
+
+/* ── DONUT ───────────────────────────────────────── */
+.donut-wrap { display:grid; grid-template-columns:1fr 1fr; gap:16px; align-items:center; }
+.donut-legend { display:flex; flex-direction:column; gap:8px; }
+.donut-leg-item { display:flex; align-items:center; gap:8px; font-size:11px; }
+.donut-leg-dot { width:10px; height:10px; border-radius:3px; flex-shrink:0; }
+.donut-leg-label { color:var(--text2); flex:1; }
+.donut-leg-val { font-family:'DM Mono',monospace; color:var(--navy); font-size:11px; font-weight:500; }
+
+/* ── FULLSCREEN CHART ────────────────────────────── */
+.fs-overlay { display:none; position:fixed; inset:0; background:rgba(13,27,42,.75); z-index:500; align-items:center; justify-content:center; padding:24px; }
+.fs-overlay.open { display:flex; }
+.fs-modal { background:white; border:1px solid var(--border); border-radius:20px; width:100%; max-width:1100px; max-height:90vh; display:flex; flex-direction:column; overflow:hidden; box-shadow:0 24px 80px rgba(13,27,42,.2); }
+.fs-header { display:flex; align-items:center; justify-content:space-between; padding:18px 24px; border-bottom:1px solid var(--border); flex-shrink:0; background:var(--cream); }
+.fs-title { font-family:'Playfair Display',serif; font-size:17px; color:var(--navy); }
+.fs-close { width:32px; height:32px; border-radius:8px; background:white; border:1px solid var(--border2); color:var(--muted); cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:16px; transition:all .15s; }
+.fs-close:hover { color:var(--navy); background:var(--cream2); }
+.fs-body { flex:1; overflow-y:auto; padding:22px; }
+.fs-chart-wrap { position:relative; width:100%; height:420px; margin-bottom:20px; }
+.fs-stats { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:16px; }
+.fs-stat { background:var(--cream); border-radius:12px; padding:14px 16px; border:1px solid var(--border); }
+.fs-stat-label { font-size:9px; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:5px; }
+.fs-stat-val { font-family:'Playfair Display',serif; font-size:20px; color:var(--navy); }
+.fs-stat-sub { font-size:10px; color:var(--muted); margin-top:2px; }
+.fs-table-wrap { overflow-x:auto; }
+.fs-table { width:100%; border-collapse:collapse; font-size:12px; }
+.fs-table th { font-size:9px; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; padding:7px 10px; text-align:left; border-bottom:2px solid var(--border); }
+.fs-table td { padding:7px 10px; border-bottom:1px solid var(--border); color:var(--text2); }
+.fs-table td.val { font-family:'DM Mono',monospace; color:var(--navy); text-align:right; font-weight:500; }
+.fs-table tr:last-child td { border-bottom:none; }
+.fs-table tr:hover td { background:var(--cream); color:var(--text); }
+.ch-clickable { cursor:pointer; transition:opacity .15s; }
+.ch-clickable:hover { opacity:.85; }
+.ch-hint { font-size:9px; color:var(--muted); text-align:right; margin-top:2px; opacity:.7; }
+
+</style>
+</head>
+<body>
+<nav class="topnav">
+  <div style="display:flex;align-items:center;">
+    <div class="nav-logo">CAPITAL</div>
+    <div class="nav-sep"></div>
+    <div class="nav-sub">Brasserie · Maastricht</div>
+  </div>
+  <div class="nav-r">
+    <div class="nav-date" id="navDate"></div>
+    <button class="nav-add-btn" onclick="openModal()">
+      <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M6 1v10M1 6h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      Rapport toevoegen
+    </button>
+    <div class="nav-pill" id="dataSourceBadge" style="cursor:pointer" onclick="loadFromSheets().then(()=>render(curPage))">● Laden...</div>
+  </div>
+</nav>
+
+<!-- STATUS BAR -->
+<div id="loadStatus" style="display:none;padding:8px 28px;font-size:11px;font-weight:500;border-bottom:1px solid var(--border);transition:all .3s;"></div>
+
+<div class="tabbar" id="tabBar">
+  <div class="tabitem active" onclick="nav('overzicht',this)">📊 Overzicht</div>
+  <div class="tabitem" onclick="nav('dag',this)">📆 Dagomzet</div>
+  <div class="tabitem" onclick="nav('week',this)">📅 Weekomzet</div>
+  <div class="tabitem" onclick="nav('maand',this)">📈 Maandomzet</div>
+  <div class="tabitem" onclick="nav('vloer',this)">🏠 Per locatie</div>
+  <div class="tabitem" onclick="nav('betaling',this)">💳 Betalingen</div>
+  <div class="tabitem" onclick="nav('vat',this)">🧾 BTW-mix</div>
+  <div class="tabitem" onclick="nav('evenementen',this)">🎉 Evenementen</div>
+  <div class="tabitem" onclick="nav('feest',this)">⭐ Feestdagen</div>
+  <div class="tabitem" onclick="nav('prognose',this)">🔮 Prognose</div>
+  <div class="tabitem" onclick="nav('daglog',this)">📋 Dagrapporten <span id="conflictDot" class="notif" style="display:none"></span></div>
+  <div class="tabitem" onclick="nav('records',this)">🏆 Records</div>
+  <div class="tabitem" onclick="nav('weekdag',this)">📆 Weekdag</div>
+</div>
+
+<!-- PAGES -->
+<main class="main">
+  <div id="page-overzicht" class="page active"></div>
+  <div id="page-dag" class="page"></div>
+  <div id="page-week" class="page"></div>
+  <div id="page-maand" class="page"></div>
+  <div id="page-vloer" class="page"></div>
+  <div id="page-betaling" class="page"></div>
+  <div id="page-vat" class="page"></div>
+  <div id="page-evenementen" class="page"></div>
+  <div id="page-feest" class="page"></div>
+  <div id="page-prognose" class="page"></div>
+  <div id="page-daglog" class="page"></div>
+  <div id="page-records" class="page"></div>
+  <div id="page-weekdag" class="page"></div>
+</main>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <h3>Rapport toevoegen</h3>
+    <div class="desc">Plak de volledige CSV-inhoud van een maandrapport óf vul een dagtotaal in.</div>
+    <select id="mMode" onchange="toggleMode()">
+      <option value="month">Maandrapport (CSV)</option>
+      <option value="day">Dagrapport (handmatig)</option>
+    </select>
+    <div id="mMonthFields">
+      <select id="mYear"><option value="2025">2025</option><option value="2026" selected>2026</option><option value="2027">2027</option></select>
+      <select id="mMonth"><option>Januari</option><option>Februari</option><option>Maart</option><option>April</option><option>Mei</option><option>Juni</option><option>Juli</option><option>Augustus</option><option>September</option><option>Oktober</option><option>November</option><option>December</option></select>
+      <textarea id="mData" placeholder="Plak hier de CSV-inhoud van het maandrapport..."></textarea>
+    </div>
+    <div id="mDayFields" style="display:none">
+      <select id="dYear"><option value="2025">2025</option><option value="2026" selected>2026</option><option value="2027">2027</option></select>
+      <select id="dMonth"><option>Januari</option><option>Februari</option><option>Maart</option><option>April</option><option>Mei</option><option>Juni</option><option>Juli</option><option>Augustus</option><option>September</option><option>Oktober</option><option>November</option><option>December</option></select>
+      <input type="number" id="dDay" placeholder="Dag (1-31)" min="1" max="31">
+      <input type="number" id="dRevenue" placeholder="Dagomzet (€)" step="0.01">
+      <input type="number" id="dTickets" placeholder="Aantal tickets" step="1">
+    </div>
+    <div id="mErr" class="modal-err"></div>
+    <div class="modal-btns">
+      <button class="btn btn-ghost" onclick="closeModal()">Annuleer</button>
+      <button class="btn btn-primary" onclick="saveModal()">Opslaan</button>
+    </div>
+  </div>
+</div>
+
+
+<script>
+// ─── DATA ───────────────────────────────────────────────────────────────────
+const MONTHS=['Januari','Februari','Maart','April','Mei','Juni','Juli','Augustus','September','Oktober','November','December'];
+const MNUM=Object.fromEntries(MONTHS.map((m,i)=>[m,i+1]));
+const WDN=['zo','ma','di','wo','do','vr','za'];
+const CYR={'2020':'#fbbf24','2021':'#f472b6','2022':'#34d399','2023':'#a78bfa','2024':'#fb923c','2025':'#94a3b8','2026':'#60a5fa','2027':'#4ade80'};
+const cyrc=yr=>CYR[yr]||'#a78bfa';
+const fmt=v=>'€'+Math.round(v).toLocaleString('nl-NL');
+const fmtK=v=>'€'+Math.round(v/1000).toLocaleString('nl-NL')+'k';
+const pct=(a,b)=>b>0?((a-b)/b*100):null;
+const ps=v=>v===null?'':(v>=0?'+':'')+v.toFixed(1)+'%';
+
+
+function yrBadge(yr){return `<span class="yr-badge yr-${yr}">${yr}</span>`;}
+function yrLegend(yrs){return `<div class="legend">${yrs.map(yr=>`<span class="leg-item">${yrBadge(yr)}<span class="leg-dot" style="background:${cyrc(yr)}"></span></span>`).join('')}</div>`;}
+
+const FEASTS={"2020":{"Januari":[{"d":1,"n":"Nieuwjaarsdag"}],"April":[{"d":10,"n":"Goede Vrijdag"},{"d":12,"n":"1e Paasdag"},{"d":13,"n":"2e Paasdag"},{"d":27,"n":"Koningsdag"}],"Mei":[{"d":5,"n":"Bevrijdingsdag"},{"d":21,"n":"Hemelvaartsdag"},{"d":31,"n":"1e Pinksterdag"}],"Juni":[{"d":1,"n":"2e Pinksterdag"}],"November":[{"d":1,"n":"Allerheiligen"},{"d":11,"n":"Wapenstilstand"}],"December":[{"d":25,"n":"1e Kerstdag"},{"d":26,"n":"2e Kerstdag"}]},"2021":{"Januari":[{"d":1,"n":"Nieuwjaarsdag"}],"April":[{"d":2,"n":"Goede Vrijdag"},{"d":4,"n":"1e Paasdag"},{"d":5,"n":"2e Paasdag"},{"d":27,"n":"Koningsdag"}],"Mei":[{"d":13,"n":"Hemelvaartsdag"},{"d":23,"n":"1e Pinksterdag"},{"d":24,"n":"2e Pinksterdag"}],"November":[{"d":1,"n":"Allerheiligen"},{"d":11,"n":"Wapenstilstand"}],"December":[{"d":25,"n":"1e Kerstdag"},{"d":26,"n":"2e Kerstdag"}]},"2022":{"Januari":[{"d":1,"n":"Nieuwjaarsdag"}],"April":[{"d":15,"n":"Goede Vrijdag"},{"d":17,"n":"1e Paasdag"},{"d":18,"n":"2e Paasdag"},{"d":27,"n":"Koningsdag"}],"Mei":[{"d":26,"n":"Hemelvaartsdag"}],"Juni":[{"d":5,"n":"1e Pinksterdag"},{"d":6,"n":"2e Pinksterdag"}],"November":[{"d":1,"n":"Allerheiligen"},{"d":11,"n":"Wapenstilstand"}],"December":[{"d":25,"n":"1e Kerstdag"},{"d":26,"n":"2e Kerstdag"}]},"2023":{"Januari":[{"d":1,"n":"Nieuwjaarsdag"}],"April":[{"d":7,"n":"Goede Vrijdag"},{"d":9,"n":"1e Paasdag"},{"d":10,"n":"2e Paasdag"},{"d":27,"n":"Koningsdag"}],"Mei":[{"d":18,"n":"Hemelvaartsdag"},{"d":28,"n":"1e Pinksterdag"},{"d":29,"n":"2e Pinksterdag"}],"November":[{"d":1,"n":"Allerheiligen"},{"d":11,"n":"Wapenstilstand"}],"December":[{"d":25,"n":"1e Kerstdag"},{"d":26,"n":"2e Kerstdag"}]},"2024":{"Januari":[{"d":1,"n":"Nieuwjaarsdag"}],"Maart":[{"d":29,"n":"Goede Vrijdag"},{"d":31,"n":"1e Paasdag"}],"April":[{"d":1,"n":"2e Paasdag"},{"d":27,"n":"Koningsdag"}],"Mei":[{"d":9,"n":"Hemelvaartsdag"},{"d":19,"n":"1e Pinksterdag"},{"d":20,"n":"2e Pinksterdag"}],"November":[{"d":1,"n":"Allerheiligen"},{"d":11,"n":"Wapenstilstand"}],"December":[{"d":25,"n":"1e Kerstdag"},{"d":26,"n":"2e Kerstdag"}]},"2025":{"Januari":[{"d":1,"n":"Nieuwjaarsdag"}],"April":[{"d":18,"n":"Goede Vrijdag"},{"d":20,"n":"1e Paasdag"},{"d":21,"n":"2e Paasdag"},{"d":26,"n":"Koningsdag"}],"Mei":[{"d":5,"n":"Bevrijdingsdag"},{"d":29,"n":"Hemelvaartsdag"}],"Juni":[{"d":8,"n":"1e Pinksterdag"},{"d":9,"n":"2e Pinksterdag"}],"November":[{"d":1,"n":"Allerheiligen"},{"d":11,"n":"Wapenstilstand"}],"December":[{"d":25,"n":"1e Kerstdag"},{"d":26,"n":"2e Kerstdag"}]},"2026":{"Januari":[{"d":1,"n":"Nieuwjaarsdag"}],"April":[{"d":3,"n":"Goede Vrijdag"},{"d":5,"n":"1e Paasdag"},{"d":6,"n":"2e Paasdag"},{"d":27,"n":"Koningsdag"}],"Mei":[{"d":14,"n":"Hemelvaartsdag"},{"d":24,"n":"1e Pinksterdag"},{"d":25,"n":"2e Pinksterdag"}],"November":[{"d":1,"n":"Allerheiligen"},{"d":11,"n":"Wapenstilstand"}],"December":[{"d":25,"n":"1e Kerstdag"},{"d":26,"n":"2e Kerstdag"}]},"2027":{"Januari":[{"d":1,"n":"Nieuwjaarsdag"}],"Maart":[{"d":26,"n":"Goede Vrijdag"},{"d":28,"n":"1e Paasdag"},{"d":29,"n":"2e Paasdag"}],"April":[{"d":27,"n":"Koningsdag"}],"Mei":[{"d":6,"n":"Hemelvaartsdag"},{"d":16,"n":"1e Pinksterdag"},{"d":17,"n":"2e Pinksterdag"}],"November":[{"d":1,"n":"Allerheiligen"},{"d":11,"n":"Wapenstilstand"}],"December":[{"d":25,"n":"1e Kerstdag"},{"d":26,"n":"2e Kerstdag"}]}};
+const VAKANTIES={"2020":[{"name":"Kerstvakantie","m":"December","s":21,"e":31},{"name":"Voorjaarsvakantie","m":"Februari","s":22,"e":29},{"name":"Meivakantie","m":"Mei","s":2,"e":10},{"name":"Zomervakantie","m":"Juli","s":18,"e":31},{"name":"Zomervakantie","m":"Augustus","s":1,"e":30},{"name":"Herfstvakantie","m":"Oktober","s":17,"e":25}],"2021":[{"name":"Kerstvakantie","m":"Januari","s":1,"e":3},{"name":"Voorjaarsvakantie","m":"Februari","s":13,"e":21},{"name":"Meivakantie","m":"April","s":26,"e":30},{"name":"Meivakantie","m":"Mei","s":1,"e":9},{"name":"Zomervakantie","m":"Juli","s":24,"e":31},{"name":"Zomervakantie","m":"Augustus","s":1,"e":5},{"name":"Herfstvakantie","m":"Oktober","s":23,"e":31},{"name":"Kerstvakantie","m":"December","s":25,"e":31}],"2022":[{"name":"Kerstvakantie","m":"Januari","s":1,"e":2},{"name":"Voorjaarsvakantie","m":"Februari","s":26,"e":28},{"name":"Voorjaarsvakantie","m":"Maart","s":1,"e":6},{"name":"Meivakantie","m":"April","s":25,"e":30},{"name":"Meivakantie","m":"Mei","s":1,"e":8},{"name":"Zomervakantie","m":"Juli","s":9,"e":31},{"name":"Zomervakantie","m":"Augustus","s":1,"e":21},{"name":"Herfstvakantie","m":"Oktober","s":22,"e":30},{"name":"Kerstvakantie","m":"December","s":26,"e":31}],"2023":[{"name":"Kerstvakantie","m":"Januari","s":1,"e":8},{"name":"Voorjaarsvakantie","m":"Februari","s":25,"e":28},{"name":"Voorjaarsvakantie","m":"Maart","s":1,"e":5},{"name":"Meivakantie","m":"April","s":24,"e":30},{"name":"Meivakantie","m":"Mei","s":1,"e":7},{"name":"Zomervakantie","m":"Juli","s":22,"e":31},{"name":"Zomervakantie","m":"Augustus","s":1,"e":20},{"name":"Herfstvakantie","m":"Oktober","s":14,"e":22},{"name":"Kerstvakantie","m":"December","s":25,"e":31}],"2024":[{"name":"Kerstvakantie","m":"Januari","s":1,"e":7},{"name":"Voorjaarsvakantie","m":"Februari","s":10,"e":18},{"name":"Meivakantie","m":"April","s":27,"e":30},{"name":"Meivakantie","m":"Mei","s":1,"e":5},{"name":"Zomervakantie","m":"Juli","s":20,"e":31},{"name":"Zomervakantie","m":"Augustus","s":1,"e":18},{"name":"Herfstvakantie","m":"Oktober","s":19,"e":27},{"name":"Kerstvakantie","m":"December","s":21,"e":31}],"2025":[{"name":"Kerstvakantie","m":"Januari","s":1,"e":5},{"name":"Voorjaarsvakantie","m":"Februari","s":22,"e":28},{"name":"Meivakantie","m":"April","s":26,"e":30},{"name":"Meivakantie","m":"Mei","s":1,"e":4},{"name":"Zomervakantie","m":"Juli","s":12,"e":31},{"name":"Zomervakantie","m":"Augustus","s":1,"e":24},{"name":"Herfstvakantie","m":"Oktober","s":18,"e":26},{"name":"Kerstvakantie","m":"December","s":20,"e":31}],"2026":[{"name":"Kerstvakantie","m":"Januari","s":1,"e":4},{"name":"Voorjaarsvakantie","m":"Februari","s":14,"e":22},{"name":"Meivakantie","m":"April","s":18,"e":30},{"name":"Meivakantie","m":"Mei","s":1,"e":3},{"name":"Zomervakantie","m":"Juli","s":11,"e":31},{"name":"Zomervakantie","m":"Augustus","s":1,"e":23},{"name":"Herfstvakantie","m":"Oktober","s":17,"e":25},{"name":"Kerstvakantie","m":"December","s":19,"e":31}]};
+
+function isVak(yr,m,d){
+  const list=(VAKANTIES[String(yr)]||[]).filter(v=>v.m===m&&d>=v.s&&d<=v.e);
+  return list.length?list[0].name:null;
+}
+
+const EVENEMENTEN={"2020":[{"name":"Carnaval","type":"carnaval","m":"Februari","s":22,"e":25,"impact":"hoog"},{"name":"TEFAF (geannuleerd)","type":"evenement","m":"Maart","s":7,"e":15,"impact":"midden"},{"name":"Amstel Gold Race (geannuleerd)","type":"evenement","m":"April","s":19,"e":19,"impact":"hoog"},{"name":"Koningsnacht","type":"evenement","m":"April","s":26,"e":26,"impact":"midden"},{"name":"Maastrichts Mooiste (geann.)","type":"evenement","m":"Juni","s":9,"e":9,"impact":"laag"},{"name":"Preuvenemint (geann.)","type":"evenement","m":"Augustus","s":27,"e":30,"impact":"laag"},{"name":"11/11 Carnavalsopening","type":"carnaval","m":"November","s":11,"e":11,"impact":"midden"},{"name":"Oudejaarsavond","type":"evenement","m":"December","s":31,"e":31,"impact":"hoog"}],"2021":[{"name":"Carnaval (geann.)","type":"carnaval","m":"Februari","s":13,"e":16,"impact":"laag"},{"name":"Amstel Gold Race (zonder publiek)","type":"evenement","m":"April","s":18,"e":18,"impact":"hoog"},{"name":"Koningsnacht","type":"evenement","m":"April","s":26,"e":26,"impact":"midden"},{"name":"Maastrichts Mooiste (geann.)","type":"evenement","m":"Juni","s":9,"e":9,"impact":"laag"},{"name":"Preuvenemint (geann.)","type":"evenement","m":"Augustus","s":27,"e":30,"impact":"laag"},{"name":"TEFAF (digitaal)","type":"evenement","m":"September","s":11,"e":13,"impact":"midden"},{"name":"11/11 Carnavalsopening","type":"carnaval","m":"November","s":11,"e":11,"impact":"midden"},{"name":"Oudejaarsavond","type":"evenement","m":"December","s":31,"e":31,"impact":"hoog"}],"2022":[{"name":"Carnaval","type":"carnaval","m":"Februari","s":26,"e":28,"impact":"hoog"},{"name":"Carnaval","type":"carnaval","m":"Maart","s":1,"e":1,"impact":"hoog"},{"name":"AGR Toerversie","type":"evenement","m":"April","s":9,"e":9,"impact":"midden"},{"name":"Amstel Gold Race","type":"evenement","m":"April","s":10,"e":10,"impact":"hoog"},{"name":"Koningsnacht","type":"evenement","m":"April","s":26,"e":26,"impact":"midden"},{"name":"Maastrichts Mooiste","type":"evenement","m":"Juni","s":12,"e":12,"impact":"midden"},{"name":"TEFAF","type":"evenement","m":"Juni","s":25,"e":30,"impact":"midden"},{"name":"Preuvenemint","type":"evenement","m":"Augustus","s":25,"e":28,"impact":"hoog"},{"name":"11/11 Carnavalsopening","type":"carnaval","m":"November","s":11,"e":11,"impact":"midden"},{"name":"Oudejaarsavond","type":"evenement","m":"December","s":31,"e":31,"impact":"hoog"}],"2023":[{"name":"Carnaval","type":"carnaval","m":"Februari","s":18,"e":21,"impact":"hoog"},{"name":"TEFAF","type":"evenement","m":"Maart","s":11,"e":19,"impact":"midden"},{"name":"AGR Toerversie","type":"evenement","m":"April","s":15,"e":15,"impact":"midden"},{"name":"Amstel Gold Race","type":"evenement","m":"April","s":16,"e":16,"impact":"hoog"},{"name":"Koningsnacht","type":"evenement","m":"April","s":26,"e":26,"impact":"midden"},{"name":"Maastrichts Mooiste","type":"evenement","m":"Juni","s":4,"e":4,"impact":"midden"},{"name":"Preuvenemint","type":"evenement","m":"Augustus","s":24,"e":27,"impact":"hoog"},{"name":"11/11 Carnavalsopening","type":"carnaval","m":"November","s":11,"e":11,"impact":"midden"},{"name":"Oudejaarsavond","type":"evenement","m":"December","s":31,"e":31,"impact":"hoog"}],"2024":[{"name":"Carnaval","type":"carnaval","m":"Februari","s":10,"e":13,"impact":"hoog"},{"name":"TEFAF","type":"evenement","m":"Maart","s":9,"e":14,"impact":"midden"},{"name":"AGR Toerversie","type":"evenement","m":"April","s":13,"e":13,"impact":"midden"},{"name":"Amstel Gold Race","type":"evenement","m":"April","s":14,"e":14,"impact":"hoog"},{"name":"Koningsnacht","type":"evenement","m":"April","s":26,"e":26,"impact":"midden"},{"name":"Maastrichts Mooiste","type":"evenement","m":"Juni","s":9,"e":9,"impact":"midden"},{"name":"Preuvenemint","type":"evenement","m":"Augustus","s":22,"e":25,"impact":"hoog"},{"name":"11/11 Carnavalsopening","type":"carnaval","m":"November","s":11,"e":11,"impact":"midden"},{"name":"Oudejaarsavond","type":"evenement","m":"December","s":31,"e":31,"impact":"hoog"}],"2025":[{"name":"Carnaval","type":"carnaval","m":"Maart","s":1,"e":4,"impact":"hoog"},{"name":"TEFAF","type":"evenement","m":"Maart","s":13,"e":20,"impact":"midden"},{"name":"AGR Toerversie","type":"evenement","m":"April","s":12,"e":12,"impact":"midden"},{"name":"Amstel Gold Race","type":"evenement","m":"April","s":13,"e":13,"impact":"hoog"},{"name":"Koningsnacht","type":"evenement","m":"April","s":26,"e":26,"impact":"midden"},{"name":"Maastrichts Mooiste","type":"evenement","m":"Juni","s":8,"e":8,"impact":"midden"},{"name":"Preuvenemint","type":"evenement","m":"Augustus","s":28,"e":31,"impact":"hoog"},{"name":"11/11 Carnavalsopening","type":"carnaval","m":"November","s":11,"e":11,"impact":"midden"},{"name":"Oudejaarsavond","type":"evenement","m":"December","s":31,"e":31,"impact":"hoog"}],"2026":[{"name":"Carnaval","type":"carnaval","m":"Februari","s":14,"e":17,"impact":"hoog"},{"name":"TEFAF","type":"evenement","m":"Maart","s":14,"e":19,"impact":"midden"},{"name":"AGR Toerversie","type":"evenement","m":"April","s":18,"e":18,"impact":"midden"},{"name":"Amstel Gold Race","type":"evenement","m":"April","s":19,"e":19,"impact":"hoog"},{"name":"Koningsnacht","type":"evenement","m":"April","s":26,"e":26,"impact":"midden"},{"name":"Maastrichts Mooiste","type":"evenement","m":"Juni","s":7,"e":7,"impact":"midden"},{"name":"Preuvenemint","type":"evenement","m":"Augustus","s":27,"e":30,"impact":"hoog"},{"name":"11/11 Carnavalsopening","type":"carnaval","m":"November","s":11,"e":11,"impact":"midden"}]};
+const EV_COLORS={'carnaval':'#f472b6','evenement':'#34d399'};
+
+// Returns array of events for year/month/day
+function getEvents(yr,m,d){
+  return (EVENEMENTEN[String(yr)]||[]).filter(e=>e.m===m&&d>=e.s&&d<=e.e);
+}
+
+// Returns first event name for a day (short)
+function getEv(yr,m,d){
+  const evs=getEvents(yr,m,d);
+  return evs.length?evs[0].name:null;
+}
+
+const WEERDATA={"carnaval":{"2020":{"date":"2020-02-23","tmax":9,"tmin":3,"precip":2.1,"cond":"bewolkt","wind":25},"2021":{"date":"2021-02-14","tmax":4,"tmin":-2,"precip":0,"cond":"bewolkt","wind":15},"2022":{"date":"2022-02-27","tmax":11,"tmin":5,"precip":0.5,"cond":"gedeeltelijk","wind":20},"2023":{"date":"2023-02-19","tmax":8,"tmin":2,"precip":1.2,"cond":"bewolkt","wind":30},"2024":{"date":"2024-02-11","tmax":12,"tmin":6,"precip":0.8,"cond":"gedeeltelijk","wind":22},"2025":{"date":"2025-03-02","tmax":6,"tmin":1,"precip":3.5,"cond":"regen","wind":28},"2026":{"date":"2026-02-15","tmax":8,"tmin":3,"precip":1.0,"cond":"bewolkt","wind":18}},"agr":{"2020":{"date":"2020-04-19","tmax":null,"tmin":null,"precip":null,"cond":"geannuleerd","wind":null},"2021":{"date":"2021-04-18","tmax":14,"tmin":4,"precip":0,"cond":"zon","wind":15},"2022":{"date":"2022-04-10","tmax":18,"tmin":7,"precip":0,"cond":"zon","wind":12},"2023":{"date":"2023-04-16","tmax":16,"tmin":7,"precip":0.2,"cond":"gedeeltelijk","wind":18},"2024":{"date":"2024-04-14","tmax":19,"tmin":8,"precip":0,"cond":"zon","wind":14},"2025":{"date":"2025-04-13","tmax":13,"tmin":5,"precip":4.2,"cond":"regen","wind":32},"2026":{"date":"2026-04-19","tmax":14,"tmin":6,"precip":0.5,"cond":"gedeeltelijk","wind":16}},"preuvenemint":{"2020":{"date":null,"tmax":null,"tmin":null,"precip":null,"cond":"geannuleerd","wind":null},"2021":{"date":null,"tmax":null,"tmin":null,"precip":null,"cond":"geannuleerd","wind":null},"2022":{"date":"2022-08-26","tmax":25,"tmin":14,"precip":0,"cond":"zon","wind":10},"2023":{"date":"2023-08-25","tmax":22,"tmin":13,"precip":0.5,"cond":"gedeeltelijk","wind":12},"2024":{"date":"2024-08-23","tmax":24,"tmin":15,"precip":0,"cond":"zon","wind":8},"2025":{"date":"2025-08-29","tmax":23,"tmin":14,"precip":1.0,"cond":"gedeeltelijk","wind":11},"2026":{"date":"2026-08-28","tmax":null,"tmin":null,"precip":null,"cond":"onbekend","wind":null}},"mooiste":{"2020":{"date":null,"tmax":null,"tmin":null,"precip":null,"cond":"geannuleerd","wind":null},"2021":{"date":null,"tmax":null,"tmin":null,"precip":null,"cond":"geannuleerd","wind":null},"2022":{"date":"2022-06-12","tmax":21,"tmin":11,"precip":0,"cond":"zon","wind":14},"2023":{"date":"2023-06-04","tmax":25,"tmin":13,"precip":0,"cond":"zon","wind":10},"2024":{"date":"2024-06-09","tmax":18,"tmin":10,"precip":2.5,"cond":"regen","wind":20},"2025":{"date":"2025-06-08","tmax":22,"tmin":12,"precip":0.3,"cond":"gedeeltelijk","wind":16},"2026":{"date":"2026-06-07","tmax":null,"tmin":null,"precip":null,"cond":"onbekend","wind":null}},"tefaf":{"2020":{"date":"2020-03-10","tmax":10,"tmin":4,"precip":0,"cond":"gedeeltelijk","wind":20},"2021":{"date":null,"tmax":null,"tmin":null,"precip":null,"cond":"digitaal","wind":null},"2022":{"date":"2022-06-27","tmax":26,"tmin":16,"precip":0,"cond":"zon","wind":8},"2023":{"date":"2023-03-15","tmax":13,"tmin":5,"precip":0.2,"cond":"gedeeltelijk","wind":22},"2024":{"date":"2024-03-11","tmax":14,"tmin":6,"precip":0,"cond":"gedeeltelijk","wind":18},"2025":{"date":"2025-03-16","tmax":12,"tmin":4,"precip":1.5,"cond":"bewolkt","wind":25},"2026":{"date":"2026-03-16","tmax":null,"tmin":null,"precip":null,"cond":"onbekend","wind":null}}};
+const WEER_ICON={'zon':'☀️','gedeeltelijk':'⛅','bewolkt':'☁️','regen':'🌧️','onweer':'⛈️','geannuleerd':'🚫','digitaal':'💻','onbekend':'❓'};
+function weerIcon(cond){return WEER_ICON[cond]||'❓';}
+
+function gf(yr,m,d){return((FEASTS[+yr]||{})[m]||[]).find(f=>f.d===+d)?.n||null;}
+
+// Built-in data (full dataset)
+const BUILTIN={"2020":{"Januari":{"total":0.0,"tickets":0,"vat9":0,"vat21":0,"pay":{"cash":0,"pin":0,"other":0,"tips":0.0},"floors":{},"days":{"1":[0.0,0],"2":[0.0,0],"3":[0.0,0],"4":[0.0,0],"5":[0.0,0],"6":[0.0,0],"7":[0.0,0],"8":[0.0,0],"9":[0.0,0],"10":[0.0,0],"11":[0.0,0],"12":[0.0,0],"13":[0.0,0],"14":[0.0,0],"15":[0.0,0],"16":[0.0,0],"17":[0.0,0],"18":[0.0,0],"19":[0.0,0],"20":[0.0,0],"21":[0.0,0],"22":[0.0,0],"23":[0.0,0],"24":[0.0,0],"25":[0.0,0],"26":[0.0,0],"27":[0.0,0],"28":[0.0,0],"29":[0.0,0],"30":[0.0,0],"31":[0.0,0]}},"Februari":{"total":0.0,"tickets":0,"vat9":0,"vat21":0,"pay":{"cash":0,"pin":0,"other":0,"tips":0.0},"floors":{},"days":{"1":[0.0,0],"2":[0.0,0],"3":[0.0,0],"4":[0.0,0],"5":[0.0,0],"6":[0.0,0],"7":[0.0,0],"8":[0.0,0],"9":[0.0,0],"10":[0.0,0],"11":[0.0,0],"12":[0.0,0],"13":[0.0,0],"14":[0.0,0],"15":[0.0,0],"16":[0.0,0],"17":[0.0,0],"18":[0.0,0],"19":[0.0,0],"20":[0.0,0],"21":[0.0,0],"22":[0.0,0],"23":[0.0,0],"24":[0.0,0],"25":[0.0,0],"26":[0.0,0],"27":[0.0,0],"28":[0.0,0],"29":[0.0,0]}},"Maart":{"total":0.0,"tickets":0,"vat9":0,"vat21":0,"pay":{"cash":0,"pin":0,"other":0,"tips":0.0},"floors":{},"days":{"1":[0.0,0],"2":[0.0,0],"3":[0.0,0],"4":[0.0,0],"5":[0.0,0],"6":[0.0,0],"7":[0.0,0],"8":[0.0,0],"9":[0.0,0],"10":[0.0,0],"11":[0.0,0],"12":[0.0,0],"13":[0.0,0],"14":[0.0,0],"15":[0.0,0],"16":[0.0,0],"17":[0.0,0],"18":[0.0,0],"19":[0.0,0],"20":[0.0,0],"21":[0.0,0],"22":[0.0,0],"23":[0.0,0],"24":[0.0,0],"25":[0.0,0],"26":[0.0,0],"27":[0.0,0],"28":[0.0,0],"29":[0.0,0],"30":[0.0,0],"31":[0.0,0]}},"April":{"total":0.0,"tickets":0,"vat9":0,"vat21":0,"pay":{"cash":0,"pin":0,"other":0,"tips":0.0},"floors":{},"days":{"1":[0.0,0],"2":[0.0,0],"3":[0.0,0],"4":[0.0,0],"5":[0.0,0],"6":[0.0,0],"7":[0.0,0],"8":[0.0,0],"9":[0.0,0],"10":[0.0,0],"11":[0.0,0],"12":[0.0,0],"13":[0.0,0],"14":[0.0,0],"15":[0.0,0],"16":[0.0,0],"17":[0.0,0],"18":[0.0,0],"19":[0.0,0],"20":[0.0,0],"21":[0.0,0],"22":[0.0,0],"23":[0.0,0],"24":[0.0,0],"25":[0.0,0],"26":[0.0,0],"27":[0.0,0],"28":[0.0,0],"29":[0.0,0],"30":[0.0,0]}},"Mei":{"total":0.0,"tickets":0,"vat9":0,"vat21":0,"pay":{"cash":0,"pin":0,"other":0,"tips":0.0},"floors":{},"days":{"1":[0.0,0],"2":[0.0,0],"3":[0.0,0],"4":[0.0,0],"5":[0.0,0],"6":[0.0,0],"7":[0.0,0],"8":[0.0,0],"9":[0.0,0],"10":[0.0,0],"11":[0.0,0],"12":[0.0,0],"13":[0.0,0],"14":[0.0,0],"15":[0.0,0],"16":[0.0,0],"17":[0.0,0],"18":[0.0,0],"19":[0.0,0],"20":[0.0,0],"21":[0.0,0],"22":[0.0,0],"23":[0.0,0],"24":[0.0,0],"25":[0.0,0],"26":[0.0,0],"27":[0.0,0],"28":[0.0,0],"29":[0.0,0],"30":[0.0,0],"31":[0.0,0]}},"Juni":{"total":1839.22,"tickets":248,"vat9":32.5,"vat21":781.9,"pay":{"cash":1839.22,"pin":0.0,"other":0,"tips":0.0},"floors":{"Boschstraat terras":56.5,"Intern":0.0,"Restaurant":1720.92,"Unknown":61.8},"days":{"1":[0.0,0],"2":[0.0,0],"3":[0.0,0],"4":[0.0,0],"5":[0.0,0],"6":[0.0,0],"7":[0.0,0],"8":[0.0,0],"9":[0.0,0],"10":[0.0,0],"11":[0.0,0],"12":[0.0,0],"13":[0.0,0],"14":[0.0,0],"15":[0.0,0],"16":[0.0,0],"17":[0.0,0],"18":[0.0,0],"19":[0.0,0],"20":[0.0,0],"21":[0.0,0],"22":[0.0,0],"23":[0.0,24],"24":[14.1,35],"25":[278.2,31],"26":[503.9,54],"27":[34.82,29],"28":[766.0,3],"29":[136.9,53],"30":[105.3,19]}},"Juli":{"total":274166.66,"tickets":8961,"vat9":144.5,"vat21":165853.11,"pay":{"cash":274132.16,"pin":5.1,"other":29.4,"tips":0.0},"floors":{"Boschstraat terras":158358.92,"Intern":5392.8,"Markt terras":1554.4,"Restaurant":17700.96,"Unknown":130.7},"days":{"1":[4845.84,205],"2":[6491.16,214],"3":[9485.6,408],"4":[11977.84,377],"5":[9332.96,264],"6":[5508.94,184],"7":[6901.24,250],"8":[4737.46,158],"9":[8745.32,303],"10":[8277.78,349],"11":[14094.9,423],"12":[8412.84,282],"13":[5321.42,204],"14":[6290.32,203],"15":[6805.56,243],"16":[6882.26,206],"17":[13438.5,459],"18":[11348.5,350],"19":[7878.12,262],"20":[8779.98,287],"21":[11228.48,377],"22":[7178.36,271],"23":[10266.56,310],"24":[9607.68,352],"25":[10978.0,339],"26":[8659.24,264],"27":[10487.86,287],"28":[9124.86,296],"29":[8538.56,282],"30":[8767.58,244],"31":[13772.94,308]}},"Augustus":{"total":266315.22,"tickets":8457,"vat9":100.0,"vat21":161580.53,"pay":{"cash":266192.92,"pin":25.8,"other":96.5,"tips":0.0},"floors":{"Boschstraat terras":157611.77,"Markt terras":92058.31,"Restaurant":16645.14},"days":{"1":[10957.21,286],"2":[7562.22,247],"3":[7058.26,237],"4":[11198.0,329],"5":[7742.34,238],"6":[7664.9,229],"7":[7949.66,282],"8":[8748.8,252],"9":[6824.9,217],"10":[2958.2,91],"11":[4515.66,164],"12":[5574.32,193],"13":[7495.32,221],"14":[13213.92,454],"15":[13624.86,354],"16":[8117.5,245],"17":[8288.89,252],"18":[9665.38,304],"19":[8891.44,307],"20":[8910.48,282],"21":[11782.58,393],"22":[14553.48,423],"23":[9887.42,281],"24":[5003.98,165],"25":[8346.8,284],"26":[6844.38,250],"27":[8812.74,319],"28":[11593.1,426],"29":[12328.34,371],"30":[7224.76,258],"31":[2975.38,103]}},"September":{"total":191302.05,"tickets":6527,"vat9":55.0,"vat21":108020.28,"pay":{"cash":191014.75,"pin":185.1,"other":102.2,"tips":0.0},"floors":{"Boschstraat terras":102407.55,"Intern":8011.4,"Markt terras":62378.76,"Restaurant":13658.44,"Vrijdag markt terras":4845.9},"days":{"1":[3935.46,154],"2":[4849.34,182],"3":[5253.1,164],"4":[10149.94,337],"5":[14050.86,403],"6":[8446.28,228],"7":[3016.95,134],"8":[3838.32,169],"9":[5518.02,210],"10":[8468.12,310],"11":[11765.22,432],"12":[14203.14,469],"13":[7939.32,272],"14":[4479.28,172],"15":[5292.22,181],"16":[3799.42,166],"17":[5603.46,254],"18":[10674.14,452],"19":[12777.84,422],"20":[6891.92,255],"21":[2973.2,118],"22":[3889.0,166],"23":[3817.22,151],"24":[4327.28,143],"25":[5563.52,232],"26":[9045.26,265],"27":[2722.82,80],"28":[0.0,0],"29":[0.0,0],"30":[8011.4,6]}},"Oktober":{"total":32276.48,"tickets":1042,"vat9":20276.81,"vat21":8408.96,"pay":{"cash":32050.88,"pin":85.0,"other":140.6,"tips":0.0},"floors":{"Boschstraat":21340.14,"Boschstraat terras":702.3,"Intern":57.96,"Markt corona":749.3,"Markt terras":110.5,"Restaurant":9311.48,"Vrijdag markt terras":4.8},"days":{"1":[1595.9,64],"2":[3408.9,129],"3":[5979.76,110],"4":[3653.8,100],"5":[0.0,0],"6":[869.38,45],"7":[1581.7,56],"8":[2024.8,63],"9":[3062.6,110],"10":[4216.58,122],"11":[1639.7,53],"12":[0.0,0],"13":[1476.16,46],"14":[2293.7,71],"15":[90.9,3],"16":[167.0,26],"17":[0.0,0],"18":[0.0,0],"19":[0.0,0],"20":[0.0,0],"21":[0.0,5],"22":[0.0,0],"23":[124.9,22],"24":[0.0,0],"25":[0.0,0],"26":[0.0,0],"27":[0.0,0],"28":[0.0,0],"29":[0.0,0],"30":[90.7,17],"31":[0.0,0]}},"November":{"total":1795.2,"tickets":204,"vat9":1619.94,"vat21":24.3,"pay":{"cash":1795.2,"pin":0,"other":0,"tips":0.0},"floors":{"Chicken Club Capital":1221.5,"Restaurant":573.7},"days":{"1":[0.0,0],"2":[0.0,0],"3":[0.0,2],"4":[0.0,0],"5":[220.0,18],"6":[349.8,28],"7":[305.1,18],"8":[52.8,13],"9":[0.0,0],"10":[0.0,0],"11":[0.0,0],"12":[157.2,6],"13":[192.5,28],"14":[84.1,17],"15":[0.0,0],"16":[0.0,0],"17":[0.0,0],"18":[0.0,0],"19":[0.0,0],"20":[146.5,28],"21":[0.0,0],"22":[0.0,0],"23":[0.0,0],"24":[0.0,0],"25":[0.0,0],"26":[0.0,0],"27":[287.2,46],"28":[0.0,0],"29":[0.0,0],"30":[0.0,0]}},"December":{"total":283.7,"tickets":52,"vat9":212.07,"vat21":43.4,"pay":{"cash":283.7,"pin":0,"other":0,"tips":0.0},"floors":{"Restaurant":283.7},"days":{"1":[0.0,0],"2":[0.0,0],"3":[0.0,0],"4":[0.0,0],"5":[0.0,0],"6":[0.0,0],"7":[0.0,0],"8":[0.0,0],"9":[0.0,0],"10":[0.0,0],"11":[218.7,40],"12":[0.0,0],"13":[0.0,0],"14":[0.0,0],"15":[0.0,0],"16":[0.0,0],"17":[0.0,0],"18":[65.0,12],"19":[0.0,0],"20":[0.0,0],"21":[0.0,0],"22":[0.0,0],"23":[0.0,0],"24":[0.0,0],"25":[0.0,0],"26":[0.0,0],"27":[0.0,0],"28":[0.0,0],"29":[0.0,0],"30":[0.0,0],"31":[0.0,0]}}},"2021":{"Januari":{"total":0.0,"tickets":0,"vat9":0,"vat21":0,"pay":{"cash":0,"pin":0,"other":0,"tips":0.0},"floors":{},"days":{"1":[0.0,0],"2":[0.0,0],"3":[0.0,0],"4":[0.0,0],"5":[0.0,0],"6":[0.0,0],"7":[0.0,0],"8":[0.0,0],"9":[0.0,0],"10":[0.0,0],"11":[0.0,0],"12":[0.0,0],"13":[0.0,0],"14":[0.0,0],"15":[0.0,0],"16":[0.0,0],"17":[0.0,0],"18":[0.0,0],"19":[0.0,0],"20":[0.0,0],"21":[0.0,0],"22":[0.0,0],"23":[0.0,0],"24":[0.0,0],"25":[0.0,0],"26":[0.0,0],"27":[0.0,0],"28":[0.0,0],"29":[0.0,0],"30":[0.0,0],"31":[0.0,0]}},"Februari":{"total":0.0,"tickets":8,"vat9":0,"vat21":0,"pay":{"cash":0,"pin":0,"other":0,"tips":0.0},"floors":{"Restaurant":0.0},"days":{"1":[0.0,0],"2":[0.0,0],"3":[0.0,0],"4":[0.0,0],"5":[0.0,0],"6":[0.0,0],"7":[0.0,0],"8":[0.0,0],"9":[0.0,0],"10":[0.0,0],"11":[0.0,0],"12":[0.0,0],"13":[0.0,0],"14":[0.0,0],"15":[0.0,0],"16":[0.0,0],"17":[0.0,0],"18":[0.0,0],"19":[0.0,0],"20":[0.0,0],"21":[0.0,0],"22":[0.0,0],"23":[0.0,0],"24":[0.0,0],"25":[0.0,0],"26":[0.0,8],"27":[0.0,0],"28":[0.0,0]}},"Maart":{"total":20.0,"tickets":69,"vat9":7.8,"vat21":9.51,"pay":{"cash":20.0,"pin":0.0,"other":0.0,"tips":0.0},"floors":{"Restaurant":20.0},"days":{"1":[0.0,0],"2":[0.0,0],"3":[0.0,0],"4":[0.0,2],"5":[0.0,0],"6":[0.0,0],"7":[0.0,0],"8":[0.0,0],"9":[0.0,0],"10":[0.0,0],"11":[0.0,4],"12":[0.0,10],"13":[0.0,0],"14":[0.0,0],"15":[0.0,0],"16":[4.5,43],"17":[0.0,4],"18":[0.0,0],"19":[15.5,4],"20":[0.0,0],"21":[0.0,0],"22":[0.0,0],"23":[0.0,0],"24":[0.0,0],"25":[0.0,2],"26":[0.0,0],"27":[0.0,0],"28":[0.0,0],"29":[0.0,0],"30":[0.0,0],"31":[0.0,0]}},"April":{"total":10631.85,"tickets":378,"vat9":6201.26,"vat21":3200.39,"pay":{"cash":1620.7,"pin":9061.15,"other":-50.0,"tips":242.3},"floors":{"Borrelterras":649.2,"Boschstraat":7313.75,"Boschstraat terras":0.0,"Chicken Club Capital":195.0,"Intern":0.0,"Restaurant":0.0,"markt":2473.9},"days":{"1":[0.0,0],"2":[0.0,0],"3":[0.0,0],"4":[0.0,0],"5":[0.0,0],"6":[0.0,0],"7":[0.0,0],"8":[0.0,0],"9":[0.0,0],"10":[0.0,0],"11":[0.0,0],"12":[0.0,0],"13":[0.0,0],"14":[0.0,0],"15":[0.0,0],"16":[0.0,0],"17":[0.0,0],"18":[0.0,0],"19":[0.0,4],"20":[0.0,0],"21":[0.0,2],"22":[0.0,0],"23":[0.0,0],"24":[0.0,0],"25":[0.0,11],"26":[195.0,7],"27":[0.0,4],"28":[4385.35,136],"29":[2367.25,74],"30":[3684.25,140]}},"Mei":{"total":137517.39,"tickets":4131,"vat9":37.8,"vat21":83904.93,"pay":{"cash":29249.21,"pin":108201.93,"other":66.25,"tips":3586.11},"floors":{"Borrelterras":6966.3,"Boschstraat":88805.58,"Intern":83.0,"Lounge":1548.71,"markt":40113.8},"days":{"1":[6253.1,187],"2":[5522.95,154],"3":[3747.42,106],"4":[0.0,0],"5":[4775.6,130],"6":[3725.4,112],"7":[4271.55,167],"8":[5622.2,137],"9":[5444.95,141],"10":[788.31,34],"11":[1806.1,71],"12":[3224.1,125],"13":[7836.2,187],"14":[7428.5,245],"15":[7829.15,219],"16":[4594.32,157],"17":[0.0,0],"18":[909.05,44],"19":[1911.6,68],"20":[3047.25,81],"21":[6788.8,233],"22":[0.0,0],"23":[8409.4,221],"24":[8775.4,261],"25":[0.0,0],"26":[3197.75,101],"27":[2108.58,83],"28":[8199.24,299],"29":[10786.7,298],"30":[10430.77,266],"31":[83.0,4]}},"Juni":{"total":135149.22,"tickets":4558,"vat9":4.2,"vat21":82115.99,"pay":{"cash":30421.48,"pin":103676.34,"other":1051.4,"tips":3892.02},"floors":{"Borrelterras":10511.3,"Boschstraat":90352.95,"Intern":647.05,"Lounge":928.35,"Restaurant":2337.9,"markt":30371.67},"days":{"1":[2932.0,92],"2":[2406.55,77],"3":[3830.05,115],"4":[6891.6,285],"5":[10403.45,234],"6":[4310.25,162],"7":[0.0,0],"8":[2486.68,86],"9":[1735.9,80],"10":[2202.25,68],"11":[8045.52,366],"12":[10163.88,271],"13":[5365.26,188],"14":[0.0,0],"15":[2010.45,72],"16":[1498.05,55],"17":[1830.9,75],"18":[6273.55,277],"19":[10012.6,299],"20":[6652.8,212],"21":[0.0,0],"22":[2929.39,116],"23":[1798.5,78],"24":[5067.37,127],"25":[8788.62,390],"26":[14451.6,444],"27":[6173.5,162],"28":[0.0,0],"29":[3328.8,142],"30":[3559.7,85]}},"Juli":{"total":174355.91,"tickets":5917,"vat9":104794.55,"vat21":49695.91,"pay":{"cash":43244.52,"pin":130702.31,"other":409.08,"tips":4761.34},"floors":{"Borrelterras":13404.67,"Boschstraat":108529.08,"Intern":3470.75,"Lounge":1245.5,"Restaurant":6812.82,"markt":40893.09},"days":{"1":[6053.52,98],"2":[10605.15,458],"3":[16093.75,374],"4":[3538.13,119],"5":[0.0,0],"6":[1258.05,50],"7":[2421.45,90],"8":[4900.37,140],"9":[11082.36,448],"10":[8704.93,307],"11":[7327.87,271],"12":[25.1,1],"13":[5005.32,157],"14":[3011.3,114],"15":[1262.7,54],"16":[3658.43,103],"17":[7353.1,192],"18":[3172.5,121],"19":[2032.65,78],"20":[4060.99,153],"21":[4853.35,199],"22":[4549.54,154],"23":[7974.19,365],"24":[6263.76,165],"25":[7340.81,250],"26":[4984.65,142],"27":[5240.05,191],"28":[4798.41,187],"29":[6548.8,227],"30":[9378.93,414],"31":[10855.75,295]}},"Augustus":{"total":245846.01,"tickets":8262,"vat9":152864.4,"vat21":65476.32,"pay":{"cash":59727.38,"pin":185194.73,"other":923.9,"tips":5787.19},"floors":{"Borrelterras":15944.9,"Boschstraat":157660.22,"Intern":3561.1,"Lounge":1143.4,"Restaurant":9078.93,"markt":58457.46},"days":{"1":[9736.68,149],"2":[5233.55,189],"3":[6139.88,237],"4":[4276.73,162],"5":[5611.21,197],"6":[8288.43,335],"7":[10752.66,303],"8":[5582.6,203],"9":[4698.0,165],"10":[7907.76,256],"11":[9742.0,264],"12":[8592.1,256],"13":[12730.55,450],"14":[12949.65,367],"15":[7509.75,280],"16":[4628.3,136],"17":[7722.57,256],"18":[7403.83,213],"19":[6624.99,212],"20":[13343.11,446],"21":[13344.15,398],"22":[6908.4,236],"23":[6295.07,213],"24":[10408.66,395],"25":[9475.35,391],"26":[5629.23,203],"27":[9817.1,404],"28":[9071.9,320],"29":[4658.92,150],"30":[4382.95,193],"31":[6379.93,283]}},"September":{"total":193365.83,"tickets":6989,"vat9":114326.28,"vat21":56820.73,"pay":{"cash":50006.48,"pin":139153.7,"other":4205.65,"tips":3682.96},"floors":{"Borrelterras":15124.15,"Boschstraat":117745.94,"Intern":3221.68,"Lounge":2343.95,"Markt":24858.12,"Restaurant":3501.53,"markt":26570.46},"days":{"1":[4020.89,149],"2":[8715.24,278],"3":[11937.75,530],"4":[12857.48,407],"5":[8061.25,268],"6":[3350.6,132],"7":[4778.04,210],"8":[4952.58,188],"9":[5555.59,177],"10":[9040.75,361],"11":[11564.75,330],"12":[5935.21,232],"13":[3347.8,136],"14":[3435.31,166],"15":[3185.15,121],"16":[3862.32,149],"17":[9751.95,382],"18":[12685.72,420],"19":[8644.35,311],"20":[2591.15,115],"21":[5016.8,216],"22":[3302.16,155],"23":[7132.48,201],"24":[12564.7,390],"25":[14680.9,497],"26":[5285.43,190],"27":[0.0,0],"28":[1804.63,97],"29":[2766.0,91],"30":[2538.85,90]}},"Oktober":{"total":151495.03,"tickets":5428,"vat9":93073.48,"vat21":41361.36,"pay":{"cash":37292.07,"pin":112685.01,"other":1517.95,"tips":2873.81},"floors":{"Borrelterras":541.35,"Boschstraat":101588.66,"Intern":3121.3,"Lounge":145.55,"Markt":29354.95,"Restaurant":16743.22},"days":{"1":[10091.8,310],"2":[9455.2,236],"3":[1617.78,56],"4":[2208.78,69],"5":[2366.08,83],"6":[2572.92,95],"7":[1394.6,47],"8":[8068.65,403],"9":[12792.36,409],"10":[8045.14,331],"11":[0.0,0],"12":[1246.83,38],"13":[764.39,37],"14":[996.44,47],"15":[5301.45,209],"16":[11324.31,382],"17":[5737.42,221],"18":[2358.27,107],"19":[3129.18,105],"20":[1768.06,46],"21":[3039.44,71],"22":[6710.38,265],"23":[9152.6,310],"24":[6959.19,307],"25":[1667.31,64],"26":[1647.9,59],"27":[4818.5,157],"28":[4652.38,187],"29":[8465.06,364],"30":[7976.88,217],"31":[5165.73,196]}},"November":{"total":84434.76,"tickets":3047,"vat9":52218.18,"vat21":22742.16,"pay":{"cash":20517.71,"pin":61102.65,"other":2814.4,"tips":1305.11},"floors":{"Boschstraat":55518.61,"Intern":2685.35,"Lounge":20.6,"Markt":6906.62,"Restaurant":19303.58},"days":{"1":[8221.48,273],"2":[3414.51,115],"3":[2673.48,89],"4":[2243.3,78],"5":[7306.58,299],"6":[8212.35,223],"7":[4486.72,133],"8":[1242.6,55],"9":[1794.75,103],"10":[1522.62,68],"11":[6845.05,272],"12":[6945.15,326],"13":[4176.6,135],"14":[2829.83,102],"15":[800.84,24],"16":[1194.48,29],"17":[1665.3,65],"18":[2431.45,38],"19":[2667.08,126],"20":[1860.6,84],"21":[1593.18,59],"22":[187.2,11],"23":[790.45,30],"24":[2126.25,30],"25":[1287.24,48],"26":[1106.3,59],"27":[3568.21,116],"28":[1241.16,57],"29":[0.0,0],"30":[0.0,0]}},"December":{"total":5006.3,"tickets":215,"vat9":3334.08,"vat21":1134.04,"pay":{"cash":2029.65,"pin":2976.65,"other":0,"tips":74.8},"floors":{"Boschstraat":2569.0,"Intern":1357.1,"Restaurant":1080.2},"days":{"1":[0.0,0],"2":[0.0,0],"3":[2279.5,69],"4":[1784.7,82],"5":[873.4,59],"6":[0.0,0],"7":[0.0,0],"8":[0.0,0],"9":[0.0,0],"10":[0.0,2],"11":[0.0,0],"12":[0.0,0],"13":[0.0,0],"14":[68.7,2],"15":[0.0,0],"16":[0.0,0],"17":[0.0,0],"18":[0.0,0],"19":[0.0,0],"20":[0.0,1],"21":[0.0,0],"22":[0.0,0],"23":[0.0,0],"24":[0.0,0],"25":[0.0,0],"26":[0.0,0],"27":[0.0,0],"28":[0.0,0],"29":[0.0,0],"30":[0.0,0],"31":[0.0,0]}}},"2022":{"Januari":{"total":18681.36,"tickets":589,"vat9":9770.36,"vat21":6637.89,"pay":{"cash":3578.3,"pin":15103.06,"other":0,"tips":513.22},"floors":{"Boschstraat":12893.81,"Lounge":212.3,"Markt":497.05,"Restaurant":5078.2},"days":{"1":[0.0,0],"2":[0.0,0],"3":[0.0,0],"4":[0.0,0],"5":[0.0,0],"6":[0.0,0],"7":[0.0,0],"8":[0.0,0],"9":[0.0,0],"10":[0.0,0],"11":[0.0,1],"12":[0.0,0],"13":[0.0,0],"14":[0.0,0],"15":[0.0,0],"16":[0.0,0],"17":[0.0,0],"18":[0.0,0],"19":[0.0,0],"20":[0.0,0],"21":[0.0,0],"22":[0.0,0],"23":[0.0,0],"24":[0.0,0],"25":[0.0,2],"26":[0.0,0],"27":[1105.15,40],"28":[5028.81,179],"29":[7123.77,166],"30":[5381.83,196],"31":[41.8,5]}},"Februari":{"total":67942.94,"tickets":2174,"vat9":35772.41,"vat21":23926.93,"pay":{"cash":15277.11,"pin":52630.83,"other":35.0,"tips":2714.2},"floors":{"Boschstraat":41940.88,"Intern":2217.1,"Lounge":1099.85,"Markt":1313.9,"Restaurant":21371.21},"days":{"1":[1788.3,50],"2":[1794.95,59],"3":[2007.25,70],"4":[4032.12,156],"5":[9381.35,231],"6":[355.7,11],"7":[1462.05,54],"8":[1027.46,46],"9":[862.15,40],"10":[1112.15,38],"11":[4127.44,160],"12":[9830.4,289],"13":[6149.55,226],"14":[2022.0,72],"15":[1867.25,58],"16":[107.89,9],"17":[1399.26,46],"18":[2338.79,78],"19":[6569.66,214],"20":[778.01,27],"21":[850.7,16],"22":[1707.61,42],"23":[4844.3,175],"24":[1526.6,7],"25":[0.0,0],"26":[0.0,0],"27":[0.0,0],"28":[0.0,0]}},"Maart":{"total":174547.22,"tickets":6624,"vat9":99652.59,"vat21":54485.36,"pay":{"cash":41108.71,"pin":133275.31,"other":163.2,"tips":4341.61},"floors":{"Boschstraat":103603.08,"Intern":1010.7,"Lounge":5075.26,"Markt":45569.94,"Restaurant":19288.24},"days":{"1":[0.0,0],"2":[7306.4,268],"3":[8652.8,346],"4":[9860.8,395],"5":[12840.55,365],"6":[7162.35,266],"7":[1301.88,62],"8":[2339.86,125],"9":[4594.85,185],"10":[6045.0,219],"11":[8621.47,395],"12":[10611.1,340],"13":[7523.5,285],"14":[1049.56,55],"15":[616.55,34],"16":[1954.5,88],"17":[1193.85,36],"18":[9819.23,435],"19":[14040.0,425],"20":[2913.4,147],"21":[2268.18,117],"22":[5019.6,208],"23":[4656.46,216],"24":[3956.26,155],"25":[12791.11,456],"26":[14097.29,425],"27":[5818.27,235],"28":[3183.45,152],"29":[1105.52,57],"30":[1992.23,93],"31":[1211.2,39]}},"April":{"total":202217.45,"tickets":7145,"vat9":113541.38,"vat21":64841.85,"pay":{"cash":55808.25,"pin":144979.1,"other":1430.1,"tips":4541.43},"floors":{"Borrelterras":0.0,"Boschstraat":116616.74,"Intern":4432.4,"Markt":59966.76,"Restaurant":21201.55},"days":{"1":[5576.45,128],"2":[4837.82,145],"3":[3463.09,145],"4":[924.15,47],"5":[1233.04,50],"6":[1343.56,59],"7":[769.03,28],"8":[3646.71,162],"9":[7205.05,209],"10":[6306.3,271],"11":[5663.67,226],"12":[7269.25,264],"13":[5662.21,205],"14":[5661.33,242],"15":[11203.95,485],"16":[14016.57,431],"17":[8914.44,303],"18":[10062.89,362],"19":[4178.41,196],"20":[4640.7,212],"21":[5887.55,230],"22":[10517.59,357],"23":[12031.14,377],"24":[8679.27,306],"25":[3707.63,124],"26":[4575.75,173],"27":[17681.91,459],"28":[6748.04,240],"29":[7405.03,346],"30":[12404.92,363]}},"Mei":{"total":213481.02,"tickets":7676,"vat9":125598.43,"vat21":63288.14,"pay":{"cash":59991.12,"pin":153189.0,"other":300.9,"tips":4935.2},"floors":{"Boschstraat":127170.68,"Intern":3144.79,"Markt":70865.93,"Restaurant":12299.62},"days":{"1":[10006.21,281],"2":[6611.04,244],"3":[9832.03,352],"4":[6416.14,248],"5":[5081.14,174],"6":[10757.83,458],"7":[14068.59,368],"8":[9325.04,285],"9":[2472.65,127],"10":[3176.2,121],"11":[3821.7,143],"12":[3278.1,117],"13":[10654.09,438],"14":[16591.7,455],"15":[7443.51,253],"16":[2581.56,101],"17":[3029.88,169],"18":[3083.3,130],"19":[2329.06,85],"20":[4836.42,204],"21":[9893.5,379],"22":[6133.68,260],"23":[1853.95,90],"24":[2722.95,99],"25":[5452.78,181],"26":[15083.4,505],"27":[14196.78,589],"28":[12772.83,440],"29":[3180.1,115],"30":[2698.29,99],"31":[4096.57,166]}},"Juni":{"total":166634.5,"tickets":6173,"vat9":94694.5,"vat21":52411.72,"pay":{"cash":45813.36,"pin":118168.69,"other":2652.45,"tips":4286.75},"floors":{"Boschstraat":98055.67,"Intern":2214.55,"Markt":61317.91,"Restaurant":5046.37},"days":{"1":[3385.44,109],"2":[5857.11,191],"3":[8776.06,414],"4":[14632.51,432],"5":[6208.16,178],"6":[10758.44,388],"7":[955.4,45],"8":[1155.65,50],"9":[2288.4,103],"10":[8126.43,326],"11":[12046.99,359],"12":[9511.78,351],"13":[2547.35,95],"14":[3571.4,150],"15":[2728.45,130],"16":[6404.45,204],"17":[8152.29,388],"18":[5977.97,196],"19":[4603.67,167],"20":[1917.3,95],"21":[2539.78,107],"22":[4710.98,177],"23":[3534.82,166],"24":[6047.71,263],"25":[9420.05,313],"26":[4260.75,180],"27":[2762.5,110],"28":[6062.09,188],"29":[3410.09,157],"30":[4280.48,141]}},"Juli":{"total":315093.71,"tickets":10615,"vat9":185718.88,"vat21":93106.6,"pay":{"cash":99931.97,"pin":215161.74,"other":0,"tips":7551.3},"floors":{"Boschstraat":190289.18,"Intern":301.25,"Markt":118023.49,"Restaurant":6479.79},"days":{"1":[8643.62,377],"2":[9951.44,361],"3":[6924.93,270],"4":[2515.75,114],"5":[3526.74,154],"6":[4107.3,167],"7":[11603.4,347],"8":[16237.45,589],"9":[16865.82,507],"10":[11820.14,392],"11":[2502.39,139],"12":[4418.0,193],"13":[3941.24,154],"14":[13081.73,382],"15":[18707.3,591],"16":[18192.54,511],"17":[12595.06,421],"18":[4472.87,164],"19":[3686.39,113],"20":[4357.08,159],"21":[15402.54,434],"22":[18939.5,636],"23":[17515.26,533],"24":[13491.75,393],"25":[4018.73,188],"26":[5597.7,249],"27":[6715.51,256],"28":[8122.99,307],"29":[16912.2,592],"30":[16926.51,519],"31":[13299.83,403]}},"Augustus":{"total":229650.76,"tickets":8560,"vat9":144605.78,"vat21":59529.37,"pay":{"cash":62009.22,"pin":167389.39,"other":252.15,"tips":5773.02},"floors":{"Boschstraat":149249.53,"Intern":508.42,"Markt":76299.79,"Restaurant":3593.02},"days":{"1":[6898.62,274],"2":[7630.62,284],"3":[5618.6,235],"4":[5567.21,234],"5":[8602.67,424],"6":[12692.57,410],"7":[9921.27,326],"8":[6477.37,250],"9":[6512.54,250],"10":[4488.78,185],"11":[5156.54,181],"12":[7647.56,329],"13":[10024.55,305],"14":[5996.43,217],"15":[8101.1,298],"16":[7993.05,281],"17":[6244.64,256],"18":[7697.0,276],"19":[11134.25,450],"20":[11846.25,400],"21":[8014.17,294],"22":[5486.28,212],"23":[8592.87,304],"24":[6482.33,237],"25":[6312.33,231],"26":[9447.45,341],"27":[8171.75,268],"28":[7069.38,258],"29":[5106.04,199],"30":[4713.04,194],"31":[4003.5,157]}},"September":{"total":146809.13,"tickets":5862,"vat9":87840.98,"vat21":42200.31,"pay":{"cash":42247.06,"pin":102153.22,"other":2408.85,"tips":3900.61},"floors":{"Boschstraat":86504.81,"Intern":8180.25,"Markt":34147.22,"Restaurant":17976.85},"days":{"1":[10964.1,226],"2":[9082.53,437],"3":[10272.7,354],"4":[4302.75,187],"5":[2763.3,119],"6":[3599.55,170],"7":[3988.65,208],"8":[4230.69,141],"9":[5804.19,272],"10":[8094.27,279],"11":[6093.21,286],"12":[2907.22,153],"13":[3332.87,123],"14":[2127.35,85],"15":[2958.06,105],"16":[6779.52,257],"17":[8238.08,266],"18":[2205.15,92],"19":[1533.5,65],"20":[2087.4,73],"21":[3271.15,174],"22":[5924.35,239],"23":[7083.77,336],"24":[8366.83,282],"25":[5966.45,247],"26":[1994.18,57],"27":[1980.79,73],"28":[1081.9,64],"29":[2912.99,123],"30":[6861.63,369]}},"Oktober":{"total":200196.18,"tickets":7500,"vat9":107.5,"vat21":123915.49,"pay":{"cash":53454.84,"pin":146741.34,"other":0,"tips":5616.23},"floors":{"Borrelterras":285.05,"Boschstraat":121763.9,"Intern":1845.65,"Markt":53185.27,"Restaurant":23116.31},"days":{"1":[11758.25,347],"2":[3896.95,136],"3":[5016.1,244],"4":[3411.01,163],"5":[3803.38,147],"6":[3386.54,156],"7":[8468.12,420],"8":[11826.6,395],"9":[9689.1,362],"10":[1231.5,60],"11":[2661.39,142],"12":[1813.82,102],"13":[2453.4,66],"14":[6336.37,254],"15":[9247.58,292],"16":[7644.65,292],"17":[2774.29,114],"18":[2798.85,137],"19":[3193.86,145],"20":[2659.58,86],"21":[10820.53,377],"22":[9808.4,355],"23":[7301.47,256],"24":[2688.4,99],"25":[3997.15,134],"26":[6267.96,251],"27":[8449.14,315],"28":[13498.28,485],"29":[14982.75,482],"30":[11356.19,394],"31":[6954.57,292]}},"November":{"total":148014.87,"tickets":5409,"vat9":80.0,"vat21":90126.36,"pay":{"cash":23083.09,"pin":109760.42,"other":15171.36,"tips":4045.31},"floors":{"Boschstraat":80371.83,"Intern":4234.31,"Markt":15934.65,"Restaurant":47474.08},"days":{"1":[11035.6,402],"2":[2996.5,153],"3":[2466.62,81],"4":[6618.51,309],"5":[9782.62,281],"6":[3321.79,129],"7":[1175.3,44],"8":[892.5,50],"9":[2213.0,76],"10":[2736.69,124],"11":[11967.63,548],"12":[13032.65,430],"13":[8062.57,291],"14":[1426.9,68],"15":[1658.35,51],"16":[2192.45,112],"17":[1925.05,66],"18":[5597.83,255],"19":[9700.62,279],"20":[5119.6,179],"21":[3212.92,130],"22":[1961.96,66],"23":[1826.11,80],"24":[2189.3,91],"25":[9883.89,318],"26":[12150.96,314],"27":[5625.9,213],"28":[1301.15,70],"29":[4016.15,113],"30":[1923.75,86]}},"December":{"total":195674.11,"tickets":6790,"vat9":50.0,"vat21":127491.42,"pay":{"cash":14.6,"pin":140154.3,"other":55505.21,"tips":5102.83},"floors":{"Boschstraat":95786.62,"Intern":8381.5,"Markt":4712.8,"Restaurant":82371.74,"chalet":4421.45},"days":{"1":[2442.49,102],"2":[6507.53,291],"3":[10075.27,314],"4":[5881.77,281],"5":[1386.7,42],"6":[2499.15,92],"7":[2180.88,82],"8":[2369.85,104],"9":[9654.31,328],"10":[14646.9,475],"11":[8492.14,358],"12":[2569.35,123],"13":[2392.23,88],"14":[3140.9,97],"15":[4666.4,144],"16":[7647.43,313],"17":[14675.42,376],"18":[7533.24,270],"19":[3317.05,158],"20":[3305.4,133],"21":[3256.44,157],"22":[5934.14,237],"23":[7376.88,223],"24":[3156.64,161],"25":[0.0,0],"26":[5357.3,214],"27":[12969.65,421],"28":[14524.1,399],"29":[15559.35,466],"30":[7600.94,290],"31":[4554.26,51]}}},"2023":{"Januari":{"total":136092.01,"tickets":5008,"vat9":81812.94,"vat21":38774.25,"pay":{"cash":46.4,"pin":101647.01,"other":34398.6,"tips":4345.46},"floors":{"Boschstraat":79221.67,"Intern":3040.0,"Markt":2594.62,"Restaurant":51124.72,"chalet":111.0},"days":{"1":[0.0,0],"2":[6522.5,201],"3":[8649.75,322],"4":[7928.37,248],"5":[9301.52,281],"6":[8595.56,348],"7":[8850.64,338],"8":[4633.85,195],"9":[0.0,0],"10":[0.0,0],"11":[2270.7,97],"12":[699.9,21],"13":[6889.22,325],"14":[8430.35,131],"15":[5986.25,236],"16":[1208.85,71],"17":[2699.5,116],"18":[2118.35,105],"19":[1239.04,50],"20":[3121.2,135],"21":[8337.96,271],"22":[4968.0,237],"23":[2217.25,94],"24":[3145.77,97],"25":[1322.65,57],"26":[2471.79,93],"27":[6394.21,278],"28":[9597.58,325],"29":[4945.85,203],"30":[1535.86,63],"31":[2009.54,70]}},"Februari":{"total":142964.27,"tickets":5577,"vat9":80209.91,"vat21":45897.92,"pay":{"cash":27.3,"pin":110844.18,"other":32092.79,"tips":4671.35},"floors":{"Boschstraat":97625.82,"Intern":18.0,"Markt":10232.0,"Restaurant":35088.45},"days":{"1":[2378.5,87],"2":[3284.55,96],"3":[6205.39,271],"4":[11189.2,340],"5":[4684.55,180],"6":[2381.85,114],"7":[3119.25,157],"8":[3423.67,169],"9":[3456.52,155],"10":[8304.82,352],"11":[12090.05,357],"12":[5433.04,231],"13":[6408.05,288],"14":[8402.7,328],"15":[4910.91,222],"16":[3521.29,144],"17":[6434.5,310],"18":[8702.48,281],"19":[0.0,0],"20":[0.0,0],"21":[0.0,0],"22":[3696.75,142],"23":[3357.45,150],"24":[7844.41,323],"25":[10987.23,379],"26":[8305.45,315],"27":[2338.27,96],"28":[2103.39,90]}},"Maart":{"total":122256.78,"tickets":4806,"vat9":69133.3,"vat21":38761.46,"pay":{"cash":33.8,"pin":92882.25,"other":29340.73,"tips":3887.84},"floors":{"Boschstraat":74943.78,"Intern":2491.15,"Markt":10335.88,"Restaurant":34485.97},"days":{"1":[3524.57,131],"2":[5084.92,143],"3":[7418.38,328],"4":[8260.18,254],"5":[5188.95,177],"6":[1785.8,68],"7":[1338.2,54],"8":[1379.22,65],"9":[1902.95,79],"10":[5287.76,201],"11":[8851.08,331],"12":[3292.1,134],"13":[1618.39,63],"14":[1162.16,46],"15":[1307.75,78],"16":[2676.61,96],"17":[8208.93,402],"18":[8999.24,328],"19":[4545.32,200],"20":[1211.98,65],"21":[1152.69,58],"22":[1400.05,80],"23":[2259.38,83],"24":[6902.57,328],"25":[7206.95,233],"26":[3216.12,110],"27":[1918.85,68],"28":[1292.24,78],"29":[2948.46,111],"30":[3179.15,128],"31":[7735.83,286]}},"April":{"total":225662.2,"tickets":8082,"vat9":130191.69,"vat21":69219.29,"pay":{"cash":73.7,"pin":170583.73,"other":55004.77,"tips":7294.09},"floors":{"Boschstraat":129564.75,"Intern":3010.6,"Markt":55765.41,"Restaurant":37321.44},"days":{"1":[10982.1,278],"2":[5082.33,190],"3":[4625.9,218],"4":[3756.95,165],"5":[6656.64,299],"6":[4527.32,164],"7":[10737.12,459],"8":[13423.94,414],"9":[9008.57,335],"10":[6145.96,250],"11":[4072.5,166],"12":[2734.4,133],"13":[5967.6,193],"14":[11591.15,472],"15":[14438.34,435],"16":[6338.19,234],"17":[2286.3,93],"18":[3828.6,162],"19":[5923.15,238],"20":[3012.25,117],"21":[11317.27,455],"22":[13148.18,386],"23":[6238.36,225],"24":[2824.35,115],"25":[4827.7,159],"26":[4903.13,192],"27":[14099.76,384],"28":[7681.73,331],"29":[11802.34,359],"30":[13680.07,461]}},"Mei":{"total":265187.55,"tickets":9161,"vat9":157839.79,"vat21":76978.91,"pay":{"cash":40.0,"pin":198220.2,"other":66927.35,"tips":89316562195728.42},"floors":{"Boschstraat":139124.56,"Intern":3572.35,"Markt":107471.89,"Restaurant":15018.75},"days":{"1":[13433.15,392],"2":[7731.57,242],"3":[9732.1,346],"4":[11611.02,399],"5":[8946.07,403],"6":[14315.69,459],"7":[5324.53,212],"8":[2811.1,129],"9":[2186.25,83],"10":[3272.15,134],"11":[4311.03,106],"12":[7192.19,296],"13":[15640.24,423],"14":[10148.07,324],"15":[3319.65,147],"16":[2444.05,97],"17":[6924.7,264],"18":[15899.71,519],"19":[15257.56,601],"20":[16551.43,505],"21":[9064.75,340],"22":[2368.19,102],"23":[2256.25,89],"24":[3860.06,189],"25":[6157.65,211],"26":[11057.64,414],"27":[17215.41,510],"28":[12592.1,371],"29":[13968.79,450],"30":[4597.25,199],"31":[4997.2,205]}},"Juni":{"total":221925.28,"tickets":8217,"vat9":120725.03,"vat21":74657.7,"pay":{"cash":75.7,"pin":164244.4,"other":57605.18,"tips":6929.65},"floors":{"Boschstraat":119660.76,"Intern":1685.68,"Markt":97258.45,"Restaurant":3320.39},"days":{"1":[4655.15,187],"2":[9728.37,431],"3":[15072.12,446],"4":[7846.88,306],"5":[6145.55,187],"6":[6302.62,219],"7":[5066.51,210],"8":[9036.89,327],"9":[12222.3,476],"10":[14209.8,415],"11":[9987.65,294],"12":[3442.56,136],"13":[4717.51,171],"14":[3277.82,152],"15":[4833.91,189],"16":[10441.38,459],"17":[10259.86,339],"18":[6345.06,237],"19":[4243.72,167],"20":[3965.4,150],"21":[4296.8,188],"22":[2952.29,111],"23":[12196.41,506],"24":[14974.5,422],"25":[5345.3,228],"26":[3220.89,154],"27":[4093.4,185],"28":[5203.85,193],"29":[5244.19,194],"30":[12596.59,538]}},"Juli":{"total":385153.77,"tickets":11460,"vat9":229294.91,"vat21":111755.03,"pay":{"cash":202.5,"pin":272051.46,"other":112899.81,"tips":14195.39},"floors":{"Boschstraat":215531.92,"Intern":4012.45,"Markt":139648.95,"Restaurant":25960.45},"days":{"1":[15048.03,355],"2":[7508.34,298],"3":[3125.37,132],"4":[5067.0,200],"5":[3926.2,135],"6":[17299.33,483],"7":[21118.25,629],"8":[17611.55,459],"9":[14702.2,394],"10":[8491.18,297],"11":[8841.69,289],"12":[6722.25,254],"13":[14849.23,443],"14":[21409.17,680],"15":[20064.68,497],"16":[17079.42,458],"17":[8148.65,270],"18":[10209.55,352],"19":[8011.12,295],"20":[17536.38,457],"21":[23817.39,715],"22":[22782.24,594],"23":[16906.68,423],"24":[7576.95,244],"25":[9488.86,331],"26":[9081.48,303],"27":[6539.7,159],"28":[13957.76,465],"29":[13490.56,374],"30":[8676.86,301],"31":[6065.7,174]}},"Augustus":{"total":297065.7,"tickets":9573,"vat9":184989.67,"vat21":78866.16,"pay":{"cash":-1.2,"pin":216762.42,"other":80304.48,"tips":9498.65},"floors":{"Boschstraat":173348.95,"Intern":5654.55,"Markt":100957.55,"Restaurant":17104.65},"days":{"1":[11565.5,273],"2":[8917.6,253],"3":[7032.3,219],"4":[12065.93,465],"5":[10788.47,280],"6":[4683.65,124],"7":[6580.38,201],"8":[6549.48,211],"9":[10331.55,320],"10":[11728.5,380],"11":[15858.08,545],"12":[14275.8,405],"13":[11287.16,382],"14":[10625.61,331],"15":[15318.14,489],"16":[11301.8,296],"17":[10132.61,324],"18":[13996.92,529],"19":[13232.29,352],"20":[8631.2,295],"21":[7760.7,263],"22":[9789.02,336],"23":[7386.6,277],"24":[6395.53,226],"25":[9661.85,390],"26":[14485.55,430],"27":[6964.08,225],"28":[4493.55,162],"29":[5961.7,226],"30":[3877.25,150],"31":[5386.9,214]}},"September":{"total":223755.55,"tickets":8062,"vat9":50.0,"vat21":126910.22,"pay":{"cash":-1.9,"pin":165744.1,"other":58013.35,"tips":7380.62},"floors":{"Boschstraat":136459.91,"Intern":450.0,"Markt":75449.51,"Restaurant":11396.13},"days":{"1":[8163.82,293],"2":[13724.7,445],"3":[8215.51,296],"4":[4650.33,219],"5":[4982.45,207],"6":[6026.23,247],"7":[6012.45,212],"8":[11046.59,463],"9":[12287.03,357],"10":[6415.37,222],"11":[4663.7,153],"12":[4145.09,142],"13":[3871.5,136],"14":[5611.46,231],"15":[11308.05,499],"16":[12992.77,425],"17":[7796.14,294],"18":[4739.35,158],"19":[2882.9,122],"20":[3955.76,144],"21":[2582.35,83],"22":[10026.45,355],"23":[12238.21,360],"24":[10175.25,368],"25":[4108.81,169],"26":[4534.85,188],"27":[4609.45,184],"28":[5268.8,178],"29":[9916.55,404],"30":[16803.63,508]}},"Oktober":{"total":215632.67,"tickets":7330,"vat9":2187.5,"vat21":124943.25,"pay":{"cash":0.3,"pin":162623.85,"other":53008.52,"tips":7164.1},"floors":{"Boschstraat":136616.99,"Intern":1056.1,"Markt":44588.04,"Restaurant":33371.54},"days":{"1":[12560.46,400],"2":[7783.12,301],"3":[4493.2,162],"4":[2786.16,100],"5":[3281.85,112],"6":[11937.87,501],"7":[18014.92,506],"8":[10713.11,378],"9":[3675.4,143],"10":[4579.13,161],"11":[3382.66,170],"12":[3642.1,126],"13":[13884.94,663],"14":[13786.42,395],"15":[7393.23,240],"16":[4078.6,120],"17":[5293.75,185],"18":[5196.94,168],"19":[4161.5,132],"20":[8018.92,280],"21":[11203.15,317],"22":[4920.55,178],"23":[4287.2,121],"24":[2750.1,88],"25":[3534.77,110],"26":[4554.1,131],"27":[9338.79,319],"28":[11632.93,351],"29":[4025.5,149],"30":[4867.05,138],"31":[5854.25,185]}},"November":{"total":198815.87,"tickets":6465,"vat9":1522.5,"vat21":114546.85,"pay":{"cash":163.25,"pin":152307.09,"other":46345.53,"tips":6156.24},"floors":{"Boschstraat":130330.94,"Intern":7169.7,"Markt":10007.05,"Restaurant":51308.18},"days":{"1":[7266.56,230],"2":[4167.95,17],"3":[10975.0,385],"4":[12784.9,337],"5":[5240.33,156],"6":[2597.75,124],"7":[3426.0,130],"8":[3621.64,130],"9":[3835.18,138],"10":[10422.02,327],"11":[15066.9,495],"12":[7879.3,263],"13":[3175.7,105],"14":[3104.75,120],"15":[3246.59,150],"16":[7364.84,227],"17":[10069.4,364],"18":[15346.2,423],"19":[7556.34,288],"20":[2636.29,110],"21":[2844.3,105],"22":[2997.46,136],"23":[4599.5,160],"24":[9724.02,319],"25":[14555.01,392],"26":[9337.75,286],"27":[2742.2,102],"28":[4121.29,152],"29":[3469.1,143],"30":[4641.6,151]}},"December":{"total":292808.77,"tickets":9029,"vat9":187564.75,"vat21":73028.35,"pay":{"cash":145.25,"pin":229740.55,"other":62922.97,"tips":8977.66},"floors":{"Boschstraat":192624.02,"Intern":2215.4,"Markt":20296.25,"Restaurant":77673.1},"days":{"1":[11402.48,350],"2":[15581.45,449],"3":[9002.13,271],"4":[2499.4,111],"5":[3289.34,130],"6":[5005.8,194],"7":[6215.5,212],"8":[11285.54,389],"9":[17071.67,472],"10":[13063.81,375],"11":[4514.92,176],"12":[4756.14,184],"13":[6151.45,205],"14":[8550.02,244],"15":[12309.17,424],"16":[21455.1,551],"17":[16026.62,469],"18":[5160.4,201],"19":[6872.6,205],"20":[6806.6,247],"21":[1884.65,47],"22":[9674.27,327],"23":[13502.49,417],"24":[4598.82,175],"25":[0.0,0],"26":[9649.51,293],"27":[13348.74,384],"28":[19154.0,509],"29":[15438.68,449],"30":[12999.67,386],"31":[5537.8,183]}}},"2024":{"Januari":{"total":183280.18,"tickets":6192,"vat9":106042.28,"vat21":55945.65,"pay":{"cash":4.2,"pin":140854.65,"other":42421.33,"tips":5775.11},"floors":{"Boschstraat":121104.41,"Intern":4512.02,"Markt":5869.3,"Restaurant":51794.45},"days":{"1":[0.0,0],"2":[3829.1,14],"3":[8277.95,283],"4":[11227.18,312],"5":[11816.55,383],"6":[11973.4,358],"7":[4793.85,187],"8":[3408.05,113],"9":[3089.0,133],"10":[3027.09,115],"11":[2831.48,103],"12":[7979.65,288],"13":[11152.35,347],"14":[6341.32,299],"15":[2757.75,104],"16":[2541.55,123],"17":[1795.0,79],"18":[2535.75,97],"19":[6615.25,236],"20":[12594.57,354],"21":[5258.4,162],"22":[1535.7,81],"23":[4330.55,126],"24":[3917.3,161],"25":[3982.85,132],"26":[9184.2,302],"27":[14895.34,472],"28":[8415.15,289],"29":[5021.9,207],"30":[5140.15,193],"31":[3011.8,139]}},"Februari":{"total":166823.76,"tickets":5763,"vat9":91135.36,"vat21":55773.52,"pay":{"cash":88.7,"pin":134159.48,"other":32575.58,"tips":5229.14},"floors":{"Boschstraat":125529.86,"Intern":612.55,"Markt":9336.05,"Restaurant":31345.3},"days":{"1":[5990.9,237],"2":[9487.13,363],"3":[12259.96,353],"4":[6403.95,243],"5":[6487.65,233],"6":[4294.09,154],"7":[3672.7,145],"8":[3586.03,124],"9":[7136.43,309],"10":[12809.98,401],"11":[0.0,0],"12":[0.0,0],"13":[0.0,0],"14":[5416.0,180],"15":[5538.5,233],"16":[9473.8,323],"17":[12354.57,391],"18":[5418.5,176],"19":[2277.6,106],"20":[5678.75,184],"21":[4013.26,131],"22":[1220.95,49],"23":[10553.47,355],"24":[13256.8,352],"25":[8250.24,281],"26":[1535.0,79],"27":[3042.8,106],"28":[3251.6,126],"29":[3413.1,129]}},"Maart":{"total":225353.64,"tickets":7913,"vat9":119671.99,"vat21":78438.53,"pay":{"cash":207.9,"pin":180670.65,"other":44475.09,"tips":6964.05},"floors":{"Boschstraat":156291.98,"Intern":344.3,"Markt":41032.97,"Restaurant":27684.39},"days":{"1":[9885.72,391],"2":[15068.84,442],"3":[9564.06,324],"4":[2626.82,127],"5":[2352.86,96],"6":[4483.22,191],"7":[3212.12,123],"8":[13397.45,551],"9":[12727.37,381],"10":[7131.93,263],"11":[2369.15,97],"12":[2913.45,114],"13":[3049.4,136],"14":[6669.98,254],"15":[10026.56,365],"16":[12079.1,350],"17":[8507.1,271],"18":[2201.8,114],"19":[3621.2,143],"20":[5024.2,190],"21":[4558.02,176],"22":[10583.54,426],"23":[13327.31,379],"24":[5006.54,188],"25":[5135.97,185],"26":[3829.96,152],"27":[4329.88,160],"28":[6607.05,199],"29":[13137.18,504],"30":[12115.08,365],"31":[9810.78,256]}},"April":{"total":241934.37,"tickets":7461,"vat9":131017.57,"vat21":81921.12,"pay":{"cash":36.9,"pin":188366.13,"other":53531.34,"tips":7274.51},"floors":{"Boschstraat":153248.73,"Intern":7456.85,"Markt":54013.56,"Restaurant":27215.23},"days":{"1":[6850.4,235],"2":[4118.05,137],"3":[4132.0,138],"4":[6087.75,162],"5":[17441.9,458],"6":[21637.85,534],"7":[9631.7,302],"8":[4111.18,131],"9":[2402.34,93],"10":[4979.63,219],"11":[3960.34,137],"12":[14081.21,498],"13":[20625.2,545],"14":[9606.02,348],"15":[2586.64,88],"16":[3028.25,110],"17":[4339.25,132],"18":[4092.5,99],"19":[7742.62,300],"20":[13142.68,321],"21":[7062.96,247],"22":[4300.76,139],"23":[6565.9,150],"24":[5516.8,139],"25":[4965.48,136],"26":[8714.49,321],"27":[17496.75,458],"28":[5052.24,214],"29":[7505.42,309],"30":[10156.06,361]}},"Mei":{"total":286310.7,"tickets":9174,"vat9":155244.48,"vat21":96770.68,"pay":{"cash":-24.8,"pin":225827.55,"other":60507.95,"tips":9100.23},"floors":{"Boschstraat":182307.47,"Intern":2382.15,"Markt":86794.02,"Restaurant":14827.06},"days":{"1":[18040.9,573],"2":[7671.18,230],"3":[10786.9,346],"4":[12507.2,353],"5":[11863.14,388],"6":[4482.2,132],"7":[6172.6,222],"8":[6539.45,230],"9":[20436.37,610],"10":[18743.5,694],"11":[17523.88,547],"12":[9636.96,317],"13":[4027.64,162],"14":[5213.42,162],"15":[3761.4,116],"16":[4582.48,164],"17":[7177.28,300],"18":[17962.78,423],"19":[11223.3,295],"20":[14268.68,434],"21":[3487.45,136],"22":[4140.8,161],"23":[5400.19,205],"24":[6435.54,224],"25":[14862.36,377],"26":[6969.2,217],"27":[4464.1,142],"28":[4049.5,158],"29":[2982.8,145],"30":[8559.55,272],"31":[12337.95,439]}},"Juni":{"total":257339.53,"tickets":8479,"vat9":135589.85,"vat21":90533.75,"pay":{"cash":-3.0,"pin":202404.22,"other":54938.31,"tips":8343.09},"floors":{"Boschstraat":157409.76,"Intern":862.95,"Markt":80117.07,"Restaurant":18949.75},"days":{"1":[13855.88,361],"2":[11400.17,414],"3":[3620.5,140],"4":[4545.99,139],"5":[2536.46,118],"6":[4864.26,170],"7":[12700.73,527],"8":[19040.24,523],"9":[14764.39,481],"10":[2034.4,81],"11":[4675.39,155],"12":[4672.98,162],"13":[5227.4,229],"14":[9103.32,348],"15":[11493.34,381],"16":[9677.02,263],"17":[4300.46,164],"18":[4197.99,142],"19":[5383.46,197],"20":[7844.66,167],"21":[11705.18,330],"22":[13100.14,431],"23":[10519.96,379],"24":[6250.54,238],"25":[10245.23,300],"26":[5784.6,201],"27":[6592.88,212],"28":[13173.1,507],"29":[16018.42,439],"30":[8010.44,280]}},"Juli":{"total":395794.09,"tickets":11524,"vat9":223709.52,"vat21":125578.1,"pay":{"cash":-1.3,"pin":289393.9,"other":106401.49,"tips":14797.33},"floors":{"Boschstraat":219096.38,"Intern":6367.1,"Markt":152223.99,"Restaurant":18106.62},"days":{"1":[12278.11,218],"2":[10195.88,220],"3":[5281.8,172],"4":[17470.91,464],"5":[20982.94,594],"6":[21372.5,547],"7":[16618.45,487],"8":[7622.22,259],"9":[6973.82,228],"10":[11193.78,298],"11":[17811.66,530],"12":[17412.04,435],"13":[21500.1,578],"14":[20441.58,562],"15":[8668.41,302],"16":[5425.92,198],"17":[9121.8,288],"18":[14903.88,416],"19":[20561.02,653],"20":[22563.62,541],"21":[15583.01,460],"22":[8715.54,296],"23":[7118.69,252],"24":[9084.1,286],"25":[10700.27,355],"26":[14068.74,530],"27":[12610.52,335],"28":[10732.16,379],"29":[7377.52,248],"30":[5194.64,169],"31":[6208.46,224]}},"Augustus":{"total":305788.91,"tickets":10276,"vat9":176091.53,"vat21":94089.13,"pay":{"cash":151.3,"pin":240392.15,"other":65245.46,"tips":9062.34},"floors":{"Boschstraat":172869.7,"Intern":115.9,"Markt":124213.97,"Restaurant":8589.34},"days":{"1":[5462.78,161],"2":[14770.21,554],"3":[15307.44,473],"4":[8866.38,321],"5":[7800.56,259],"6":[8938.64,261],"7":[8584.52,292],"8":[10158.03,298],"9":[13384.2,504],"10":[13292.9,424],"11":[7623.8,277],"12":[4938.54,186],"13":[5037.0,157],"14":[9865.04,273],"15":[14427.7,459],"16":[13771.86,547],"17":[17923.29,491],"18":[9379.02,309],"19":[6585.34,218],"20":[5893.74,200],"21":[7014.14,254],"22":[9039.12,300],"23":[10263.56,433],"24":[11437.7,344],"25":[10951.5,373],"26":[6972.44,243],"27":[8827.88,321],"28":[7580.06,262],"29":[7858.94,272],"30":[9087.3,368],"31":[14745.28,442]}},"September":{"total":239219.59,"tickets":8296,"vat9":50.0,"vat21":125053.52,"pay":{"cash":33.8,"pin":189780.54,"other":49405.25,"tips":7093.84},"floors":{"Boschstraat":145529.52,"Intern":1389.75,"Markt":74645.13,"Restaurant":17655.19},"days":{"1":[6889.7,266],"2":[4648.66,165],"3":[6712.5,228],"4":[4339.73,166],"5":[5554.79,203],"6":[8479.74,366],"7":[14716.55,423],"8":[7757.16,315],"9":[3527.8,127],"10":[5107.22,206],"11":[4941.86,177],"12":[4664.93,151],"13":[11240.92,426],"14":[16297.84,506],"15":[10372.29,361],"16":[3775.1,158],"17":[3226.0,137],"18":[11318.75,405],"19":[11025.44,377],"20":[15324.98,630],"21":[20566.66,555],"22":[7774.46,316],"23":[2892.0,127],"24":[4377.35,162],"25":[4517.2,119],"26":[7064.0,179],"27":[10418.24,399],"28":[13842.36,363],"29":[5690.0,208],"30":[2155.36,75]}},"Oktober":{"total":271931.86,"tickets":9485,"vat9":150382.98,"vat21":89267.82,"pay":{"cash":124.1,"pin":217797.33,"other":54010.43,"tips":8788.85},"floors":{"Boschstraat":170151.37,"Intern":2042.25,"Markt":71060.52,"Restaurant":28677.72},"days":{"1":[2882.86,118],"2":[4402.6,165],"3":[8832.3,313],"4":[14119.34,571],"5":[18366.9,563],"6":[9587.1,357],"7":[4363.14,140],"8":[3757.96,150],"9":[2211.4,96],"10":[4398.48,141],"11":[12533.86,502],"12":[13602.52,403],"13":[9534.36,435],"14":[2415.1,101],"15":[3690.34,164],"16":[6550.26,287],"17":[5808.84,231],"18":[11569.15,441],"19":[13376.22,389],"20":[6793.42,267],"21":[2963.56,104],"22":[7028.76,284],"23":[8749.0,307],"24":[11256.24,353],"25":[15755.44,547],"26":[20214.46,531],"27":[9353.64,282],"28":[6907.52,249],"29":[9756.65,306],"30":[7740.98,274],"31":[13409.46,414]}},"November":{"total":274302.57,"tickets":8962,"vat9":153812.37,"vat21":88137.74,"pay":{"cash":0.0,"pin":212974.68,"other":61327.89,"tips":7550.97},"floors":{"Boschstraat":172725.08,"Intern":10424.9,"Markt":34798.92,"Restaurant":56353.67},"days":{"1":[18070.54,616],"2":[16727.88,482],"3":[10718.44,373],"4":[4909.44,216],"5":[4863.04,187],"6":[4351.9,140],"7":[5828.8,220],"8":[11170.44,389],"9":[15139.4,467],"10":[10348.43,409],"11":[20008.58,371],"12":[4385.5,172],"13":[4250.0,150],"14":[5486.09,187],"15":[12233.28,427],"16":[16703.74,452],"17":[8086.88,299],"18":[3300.06,149],"19":[1883.46,79],"20":[3598.92,131],"21":[4434.0,174],"22":[9766.74,311],"23":[13499.2,391],"24":[11188.24,403],"25":[4830.74,159],"26":[4936.4,210],"27":[5243.25,187],"28":[7023.0,260],"29":[12758.78,461],"30":[18557.4,490]}},"December":{"total":310857.45,"tickets":9768,"vat9":21.0,"vat21":196917.05,"pay":{"cash":-3.3,"pin":246474.55,"other":64386.2,"tips":8959.26},"floors":{"Boschstraat":205669.03,"Intern":1378.7,"Markt":16723.92,"Restaurant":87085.8},"days":{"1":[11433.22,386],"2":[4165.68,177],"3":[4693.58,170],"4":[4269.96,170],"5":[4390.7,168],"6":[11734.44,425],"7":[17401.85,470],"8":[12620.02,407],"9":[4612.25,175],"10":[7560.02,228],"11":[6414.1,252],"12":[8281.6,270],"13":[13306.34,446],"14":[18742.6,520],"15":[12529.8,419],"16":[5136.57,199],"17":[6744.92,240],"18":[6567.96,226],"19":[12110.9,257],"20":[14071.14,508],"21":[17855.32,480],"22":[14403.38,381],"23":[12626.14,368],"24":[3905.1,159],"25":[0.0,0],"26":[10430.34,315],"27":[15677.96,460],"28":[16959.8,544],"29":[15058.04,410],"30":[13558.22,388],"31":[3595.5,150]}}},"2025":{"Januari":{"total":229109.65,"tickets":7355,"vat9":124304.04,"vat21":77370.36,"pay":{"cash":209.2,"pin":183225.81,"other":45674.64,"tips":6802.28},"floors":{"Boschstraat":158983.28,"Intern":6823.45,"Markt":4360.8,"Restaurant":58942.12},"days":{"1":[0,0],"2":[11607.56,308],"3":[13058.93,449],"4":[11771.72,361],"5":[4521.7,155],"6":[3656.85,84],"7":[6415.4,232],"8":[5773.1,196],"9":[7804.6,148],"10":[7165.22,262],"11":[12979.51,345],"12":[7799.94,275],"13":[4145.5,168],"14":[4497.3,146],"15":[4039.6,148],"16":[5772,185],"17":[8664.56,321],"18":[13970.1,373],"19":[7357.82,260],"20":[3396.4,144],"21":[5706.34,212],"22":[4287.42,159],"23":[4668.55,173],"24":[9965.04,298],"25":[14878.02,375],"26":[10081.68,320],"27":[6608.66,234],"28":[6415.7,228],"29":[4292.4,159],"30":[5169.79,188],"31":[12638.24,449]}},"Februari":{"total":234425.29,"tickets":8194,"vat9":125982.35,"vat21":80251.15,"pay":{"cash":0,"pin":191671.23,"other":42754.06,"tips":6681.44},"floors":{"Boschstraat":156477.7,"Intern":2116.6,"Markt":29880.99,"Restaurant":45950},"days":{"1":[17380.34,480],"2":[11869.14,404],"3":[5901,237],"4":[5535.32,226],"5":[5004.3,181],"6":[5390.2,195],"7":[10868.25,370],"8":[16438.15,482],"9":[9302,311],"10":[4270.38,154],"11":[3729.68,141],"12":[4981.44,190],"13":[3394.1,146],"14":[12067.1,415],"15":[13643.38,429],"16":[10330.52,410],"17":[4109.9,196],"18":[4352.5,203],"19":[3962.35,158],"20":[5403.2,184],"21":[17256.03,624],"22":[14230.94,394],"23":[14410.12,456],"24":[3168.5,140],"25":[5426.88,180],"26":[6719.25,267],"27":[6041.96,222],"28":[9238.36,399]}},"Maart":{"total":272583.49,"tickets":9304,"vat9":150347.86,"vat21":89838.17,"pay":{"cash":91.9,"pin":223333.33,"other":49158.26,"tips":8227.26},"floors":{"Boschstraat":168729.97,"Intern":1087.45,"Markt":79448.11,"Restaurant":23317.96},"days":{"1":[9760.02,309],"2":[0,0],"3":[0,0],"4":[0,0],"5":[11290.75,423],"6":[12025,399],"7":[16817.98,606],"8":[19318.7,519],"9":[15264.74,443],"10":[5941.3,221],"11":[2425.8,108],"12":[2967.95,118],"13":[4351.02,149],"14":[10194.08,384],"15":[13051.02,386],"16":[11167.22,422],"17":[2488.76,110],"18":[4697.46,202],"19":[8285.16,299],"20":[10031.6,331],"21":[19893.98,632],"22":[16498.68,433],"23":[11033.34,374],"24":[3183.5,147],"25":[5358.02,186],"26":[4699.08,168],"27":[8510.18,341],"28":[16038.72,590],"29":[15126.34,497],"30":[8072.64,321],"31":[4090.45,186]}},"April":{"total":335390.69,"tickets":10644,"vat9":182186.93,"vat21":113062.59,"pay":{"cash":62.4,"pin":270961.91,"other":64366.38,"tips":10002.41},"floors":{"Boschstraat":184479.09,"Intern":380.4,"Markt":133762.62,"Restaurant":16768.58},"days":{"1":[6889.4,246],"2":[7159.28,262],"3":[11895.61,355],"4":[21230.56,640],"5":[20321.78,527],"6":[14465.72,451],"7":[6651.4,242],"8":[6291.64,235],"9":[6627.44,245],"10":[6205.18,202],"11":[17269.8,617],"12":[22244.52,570],"13":[6194.74,240],"14":[7536,308],"15":[6681.22,214],"16":[4841.06,144],"17":[7467.62,183],"18":[17343.46,569],"19":[20893.17,598],"20":[10443.85,371],"21":[11164.41,393],"22":[7099.9,275],"23":[5128.38,177],"24":[6228.52,169],"25":[10379.96,384],"26":[24005.8,592],"27":[10949.28,389],"28":[9149.86,326],"29":[10553.6,342],"30":[12077.53,378]}},"Mei":{"total":343325.47,"tickets":11102,"vat9":40,"vat21":185559.99,"pay":{"cash":105.1,"pin":275705.92,"other":67514.45,"tips":10113.94},"floors":{"Boschstraat":190557.23,"Intern":1357.3,"Markt":136007.9,"Restaurant":15403.04},"days":{"1":[22097.28,591],"2":[20382.3,714],"3":[17005.52,407],"4":[9212.74,316],"5":[6275.62,235],"6":[5853.96,230],"7":[4468.88,172],"8":[8580.94,327],"9":[19580.2,672],"10":[20619.7,555],"11":[10771.58,364],"12":[4487.6,188],"13":[6428.7,252],"14":[5903.16,239],"15":[6955.5,222],"16":[16440.02,619],"17":[18035.76,507],"18":[10097.82,320],"19":[6114.2,213],"20":[5605.32,203],"21":[4892.46,185],"22":[6714.78,209],"23":[11373.44,463],"24":[15123.64,353],"25":[8630.9,294],"26":[5008.5,224],"27":[4299.87,151],"28":[6823,185],"29":[17343.99,495],"30":[21077.27,705],"31":[17120.82,492]}},"Juni":{"total":292241.25,"tickets":9289,"vat9":151631.5,"vat21":104926.71,"pay":{"cash":3.9,"pin":237639.52,"other":54597.83,"tips":9769.41},"floors":{"Boschstraat":170052.11,"Intern":0,"Markt":113952.04,"Restaurant":8237.1},"days":{"1":[8665.02,306],"2":[4585.1,193],"3":[5054.8,186],"4":[4312.84,139],"5":[4912.2,145],"6":[11772.42,422],"7":[14862.26,393],"8":[17048.18,485],"9":[12953.72,469],"10":[5078.8,206],"11":[6866.12,267],"12":[10410.7,298],"13":[11176.94,383],"14":[12405.25,339],"15":[9936.32,322],"16":[4854.38,206],"17":[8255.82,253],"18":[8164.26,272],"19":[12509.02,367],"20":[15151.28,498],"21":[14146.64,371],"22":[7466.16,272],"23":[6475.5,184],"24":[10052.69,309],"25":[8512.16,295],"26":[9039.04,277],"27":[14618.41,537],"28":[16983.68,443],"29":[10261.72,265],"30":[5709.82,187]}},"Juli":{"total":479417.08,"tickets":13040,"vat9":273776.38,"vat21":149585.37,"pay":{"cash":121.3,"pin":374734.45,"other":104561.33,"tips":15586.42},"floors":{"Boschstraat":272407.92,"Intern":1760.9,"Markt":187742.65,"Restaurant":17505.61},"days":{"1":[8537.98,251],"2":[8108.14,232],"3":[22609.15,563],"4":[26376.3,673],"5":[25619.55,582],"6":[15842.2,326],"7":[7734.12,241],"8":[8620.56,260],"9":[11627.06,374],"10":[18567.89,520],"11":[26034.77,726],"12":[26701.38,594],"13":[21233.85,516],"14":[8086.36,251],"15":[8488.72,330],"16":[11284.96,294],"17":[18935.49,497],"18":[23135.9,662],"19":[22922.35,564],"20":[19779.3,443],"21":[15690.24,448],"22":[9795.72,316],"23":[10214.78,343],"24":[12748.79,341],"25":[17572.88,595],"26":[17942.72,489],"27":[10170,264],"28":[10357.72,312],"29":[11809.02,355],"30":[12933.12,407],"31":[9936.06,271]}},"Augustus":{"total":391302.62,"tickets":12082,"vat9":221138.14,"vat21":124182.16,"pay":{"cash":3.8,"pin":317834.05,"other":73464.77,"tips":11022.81},"floors":{"Boschstraat":219227.45,"Intern":948.45,"Markt":161557.74,"Restaurant":9568.98},"days":{"1":[16026.94,507],"2":[15771.05,414],"3":[14019.88,419],"4":[7975.4,248],"5":[11041.48,349],"6":[12153.98,360],"7":[12875.1,368],"8":[17888.1,638],"9":[19367.92,536],"10":[12477.88,377],"11":[9235.06,267],"12":[7857.04,251],"13":[8086.12,227],"14":[10353.82,273],"15":[17560.3,581],"16":[15004.28,432],"17":[12137.08,392],"18":[9225.18,306],"19":[7977.2,250],"20":[10743.06,363],"21":[12598.15,367],"22":[14164.68,498],"23":[17472.08,481],"24":[15993.36,425],"25":[12276.94,373],"26":[11231.8,350],"27":[9788,318],"28":[9358.58,335],"29":[14275.72,546],"30":[16729.26,505],"31":[9637.18,326]}},"September":{"total":301184.52,"tickets":9618,"vat9":159664.47,"vat21":105083.04,"pay":{"cash":34.4,"pin":242650.02,"other":58500.1,"tips":8588.89},"floors":{"Boschstraat":181229.35,"Intern":440.3,"Markt":104103.21,"Restaurant":15411.66},"days":{"1":[7322.7,262],"2":[7798.6,262],"3":[7086.3,245],"4":[7974.65,277],"5":[18189.26,641],"6":[20161.48,549],"7":[11150.7,398],"8":[6683.14,226],"9":[5077.06,168],"10":[8271.35,312],"11":[7180.22,219],"12":[12795.5,482],"13":[15329.94,427],"14":[12352.42,395],"15":[4208.17,165],"16":[5450.62,180],"17":[5440.64,193],"18":[7805.8,229],"19":[18636.5,627],"20":[20539.66,522],"21":[7841.42,243],"22":[5028.2,181],"23":[5772.92,198],"24":[5602.14,161],"25":[6672.53,199],"26":[15005.23,558],"27":[19033.83,477],"28":[16113.09,443],"29":[5445.15,189],"30":[5215.3,190]}},"Oktober":{"total":310685.86,"tickets":9278,"vat9":168715.7,"vat21":104783.25,"pay":{"cash":12.5,"pin":254279.56,"other":56393.8,"tips":8626.79},"floors":{"Boschstraat":207612.63,"Intern":762.55,"Markt":63434.12,"Restaurant":38876.56},"days":{"1":[7523.93,254],"2":[9209.63,311],"3":[17707.93,562],"4":[15299.69,384],"5":[9040.15,266],"6":[0,0],"7":[5072.3,125],"8":[4507.08,174],"9":[8425.12,268],"10":[12963.32,468],"11":[16674.63,420],"12":[12810.45,355],"13":[4252.47,164],"14":[7186.5,199],"15":[6076.12,201],"16":[8808.84,262],"17":[14472.58,441],"18":[21254.38,513],"19":[12387.09,380],"20":[8617.66,227],"21":[8468.3,210],"22":[5211.56,206],"23":[1114.7,41],"24":[16012.56,508],"25":[15734.47,368],"26":[11844.16,328],"27":[6800.2,211],"28":[7889.73,237],"29":[8350.07,286],"30":[11407.68,373],"31":[15562.56,536]}},"November":{"total":339730.14,"tickets":10296,"vat9":75,"vat21":188235.02,"pay":{"cash":116.4,"pin":280694.44,"other":58919.3,"tips":8814.4},"floors":{"Boschstraat":220160.54,"Intern":4533.02,"Markt":63006.42,"Restaurant":52030.16},"days":{"1":[18488.14,506],"2":[11380.09,385],"3":[5658.25,200],"4":[6881.22,239],"5":[10070.17,302],"6":[9460.14,286],"7":[18543.7,596],"8":[23842.79,599],"9":[13874.24,449],"10":[10042.96,319],"11":[14225.42,482],"12":[5862.15,227],"13":[9796.95,341],"14":[17557.73,534],"15":[21380.54,505],"16":[7733.2,273],"17":[6997.32,188],"18":[4783.6,165],"19":[5168.8,153],"20":[6213.34,223],"21":[11562.15,429],"22":[16612.04,452],"23":[7538,248],"24":[4845,164],"25":[5697.58,191],"26":[7237,217],"27":[8437.8,217],"28":[13595.18,411],"29":[22885.06,624],"30":[13359.58,371]}},"December":{"total":383271.9,"tickets":11600,"vat9":230749.28,"vat21":108891.11,"pay":{"cash":-3.71,"pin":305539.34,"other":77736.27,"tips":11013.52},"floors":{"Boschstraat":240494.51,"Intern":4286.14,"Markt":58219.31,"Restaurant":80271.94},"days":{"1":[6577.28,209],"2":[9693.2,248],"3":[6830.5,218],"4":[6630.64,285],"5":[14752.5,485],"6":[20502.62,529],"7":[12664.14,365],"8":[4903.86,170],"9":[6758.56,270],"10":[5890.21,229],"11":[12068.66,354],"12":[17526.37,580],"13":[23572.25,609],"14":[17533.86,537],"15":[8000.9,284],"16":[9096,324],"17":[8821.63,288],"18":[12325.53,383],"19":[17254.82,551],"20":[25127.81,679],"21":[22664.82,619],"22":[16168.7,478],"23":[12076.38,396],"24":[2724.84,91],"25":[0,0],"26":[13403.31,368],"27":[20289.72,558],"28":[19403.08,624],"29":[14729.68,435],"30":[15280.03,434],"31":[0,0]}}},"2026":{"Januari":{"total":244911.52,"tickets":7568,"vat9":121368.78,"vat21":93075.24,"pay":{"cash":71,"pin":205845.88,"other":38994.64,"tips":6760.84},"floors":{"Boschstraat":174428.84,"Intern":666.2,"Markt":16836.46,"Restaurant":52980.02},"days":{"1":[0,0],"2":[12421.45,382],"3":[9551.13,273],"4":[5087.27,170],"5":[5162.86,150],"6":[1557.74,81],"7":[3072.56,110],"8":[3762.72,113],"9":[6559.68,179],"10":[9882.06,262],"11":[5972.67,203],"12":[6534.42,213],"13":[4661.68,167],"14":[4218.22,135],"15":[6853.52,195],"16":[12173.32,415],"17":[19720.88,529],"18":[14770.04,509],"19":[4236.6,167],"20":[6013.53,214],"21":[5992.1,212],"22":[6474.22,208],"23":[12832.26,440],"24":[19684.14,479],"25":[7741.3,276],"26":[3757.69,126],"27":[5123,168],"28":[5083.46,165],"29":[7000.3,192],"30":[12977.3,430],"31":[16033.4,405]}},"Februari":{"total":228595.07,"tickets":7114,"vat9":115429.51,"vat21":84940.88,"pay":{"cash":-0.5,"pin":193760.3,"other":34835.27,"tips":7210.22},"floors":{"Boschstraat":165781.21,"Intern":466.9,"Markt":29975.86,"Restaurant":32371.1},"days":{"1":[9695.12,298],"2":[4645.38,182],"3":[5050.88,174],"4":[7984.12,288],"5":[6737.01,193],"6":[11427.54,354],"7":[18525.82,498],"8":[12661,385],"9":[3963.3,163],"10":[4295.32,158],"11":[4951.46,144],"12":[5890.28,190],"13":[8725.44,331],"14":[9938.42,297],"15":[0,0],"16":[0,0],"17":[0,0],"18":[5305.76,209],"19":[6099.16,165],"20":[10616.14,357],"21":[11536.85,298],"22":[5903.18,172],"23":[4898.66,164],"24":[6463.26,213],"25":[17712.89,478],"26":[11389.22,403],"27":[18010.88,605],"28":[16167.98,395]}},"Maart":{"total":303032.77,"tickets":9559,"vat9":153718.3,"vat21":111968.39,"pay":{"cash":95.4,"pin":254575.67,"other":48361.7,"tips":8729.37},"floors":{"Boschstraat":196023.44,"Intern":1399.45,"Markt":80836.94,"Restaurant":24772.94},"days":{"1":[13033.7,419],"2":[7510.22,264],"3":[9510.91,288],"4":[10652.34,331],"5":[12341.88,368],"6":[16958.16,585],"7":[20069.88,523],"8":[14652.26,399],"9":[5913,237],"10":[4689.68,154],"11":[4349.16,149],"12":[6074.36,212],"13":[8069.04,279],"14":[10536.06,277],"15":[9417.23,319],"16":[3933.04,157],"17":[4745.22,196],"18":[9028,292],"19":[9487,324],"20":[18064.16,591],"21":[22433.46,566],"22":[14452.82,443],"23":[4366.28,158],"24":[5018.44,188],"25":[3532.12,128],"26":[5458.68,181],"27":[14389.38,501],"28":[13981.92,370],"29":[11429.38,362],"30":[3444.94,130],"31":[5490.05,168]}},"April":{"total":228403.57,"tickets":7046,"vat9":91505.63,"vat21":66094.38,"pay":{"cash":21.2,"pin":149772.12,"other":29920.66,"tips":5203.59},"floors":{"Boschstraat":109248.94,"Intern":948,"Markt":57029.4,"Restaurant":12487.64},"days":{"1":[8327.36,293],"2":[7281,216],"3":[17082.28,597],"4":[17625.44,470],"5":[9953.68,242],"6":[16454.36,445],"7":[14420.24,453],"8":[13288.7,420],"9":[11902.74,385],"10":[13901.36,501],"11":[19210.38,484],"12":[8384.84,290],"13":[4201.98,130],"14":[8298.72,292],"15":[9380.9,356],"16":[11112.70,354],"17":[19426.96,624],"18":[18149.93,493],"19":[0,0],"20":[0,0],"21":[0,0],"22":[0,0],"23":[0,0],"24":[0,0],"25":[0,0],"26":[0,0],"27":[0,0],"28":[0,0],"29":[0,0],"30":[0,0]}}}};
+
+let DB={};
+let DAYLOGS={};  // {yr: {m: {d: {rev, tickets, source:'day'|'month'}}}}
+
+// ─── GOOGLE SHEETS CONFIGURATIE ─────────────────────────────────────────────
+const SHEET_ID = '14TKvkkReXRtz6Bjfv0hu4UoDKame9pVlcZCySUEFDXQ';
+const SHEETS_BASE = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=`;
+
+// Vloernamen normaliseren naar de 4 standaard locaties
+function normFloor(name){
+  if(!name) return null;
+  const n=name.toLowerCase().trim();
+  if(n.includes('markt')||n==='markt') return 'Markt';
+  if(n.includes('boschstraat')||n==='boschstraat') return 'Boschstraat';
+  if(n.includes('restaurant')) return 'Restaurant';
+  if(n.includes('intern')) return 'Intern';
+  return null; // overige vloeren negeren
+}
+
+// Parseer Maand_Omzet CSV naar DB formaat
+function parseMaandCSV(csv){
+  const lines=csv.split('\n').filter(l=>l.trim());
+  if(lines.length<2) return;
+  const headers=lines[0].split(',').map(h=>h.replace(/"/g,'').trim());
+  const col=h=>headers.indexOf(h);
+
+  lines.slice(1).forEach(line=>{
+    // Handle quoted commas
+    const cells=[];
+    let cur='',inQ=false;
+    for(const c of line){ if(c==='"'){inQ=!inQ;}else if(c===','&&!inQ){cells.push(cur.trim());cur='';}else{cur+=c;} }
+    cells.push(cur.trim());
+
+    const yr=String(parseInt(cells[col('Jaar')]||''));
+    const mNr=parseInt(cells[col('Maand')]||'0');
+    const mNaam=cells[col('Maand_Naam')]||'';
+    if(!yr||!mNr||!mNaam||yr==='NaN') return;
+
+    const g=v=>parseFloat(cells[col(v)]||'0')||0;
+    const total=g('Totaal_Omzet');
+    if(!total&&total!==0) return;
+
+    if(!DB[yr]) DB[yr]={};
+
+    // Vloerdata uit kolommen
+    const floors={};
+    ['Vloer_Markt','Vloer_Boschstraat','Vloer_Restaurant','Vloer_Intern'].forEach(k=>{
+      const v=g(k);
+      const nm=k.replace('Vloer_','');
+      if(v) floors[nm]=v;
+    });
+
+    // Bouw maandobject - dagdata komt uit Dag_Omzet, hier alleen maandsummary
+    const existing=DB[yr][mNaam]||{};
+    DB[yr][mNaam]={
+      total:total||existing.total||0,
+      tickets:parseInt(cells[col('Aantal_Bonnen')])||existing.tickets||0,
+      vat9:g('Omzet_9pct')||existing.vat9||0,
+      vat21:g('Omzet_21pct')||existing.vat21||0,
+      pay:{
+        cash:g('Betaling_Cash'),
+        pin:g('Betaling_Pin'),
+        other:0,
+        tips:existing.pay?.tips||0
+      },
+      floors:Object.keys(floors).length?floors:(existing.floors||{}),
+      days:existing.days||{}
+    };
+  });
+}
+
+// Parseer Dag_Omzet CSV en vul days in DB
+function parseDagCSV(csv){
+  const lines=csv.split('\n').filter(l=>l.trim());
+  if(lines.length<2) return;
+  const headers=lines[0].split(',').map(h=>h.replace(/"/g,'').trim());
+  const col=h=>headers.indexOf(h);
+
+  lines.slice(1).forEach(line=>{
+    const cells=[];
+    let cur='',inQ=false;
+    for(const c of line){ if(c==='"'){inQ=!inQ;}else if(c===','&&!inQ){cells.push(cur.trim());cur='';}else{cur+=c;} }
+    cells.push(cur.trim());
+
+    const yr=String(parseInt(cells[col('Jaar')]||''));
+    const mNr=parseInt(cells[col('Maand')]||'0');
+    const dag=parseInt(cells[col('Dag')]||'0');
+    if(!yr||!mNr||!dag||yr==='NaN') return;
+
+    const mNaam=MONTHS[mNr-1];
+    if(!mNaam) return;
+
+    const omzet=parseFloat(cells[col('Totaal_Omzet')])||0;
+    // Dag_Omzet sheet heeft geen aparte bonnen-kolom - gebruik 0 als fallback
+    const bonIdx=col('Aantal_Bonnen');
+    const tickets=bonIdx>=0?parseInt(cells[bonIdx]||'0')||0:0;
+
+    if(!DB[yr]) DB[yr]={};
+    if(!DB[yr][mNaam]) DB[yr][mNaam]={total:0,tickets:0,vat9:0,vat21:0,pay:{cash:0,pin:0,other:0,tips:0},floors:{},days:{}};
+
+    DB[yr][mNaam].days[String(dag)]=[omzet, tickets];
+
+    // Vloer data toevoegen aan maand als beschikbaar in dag sheet
+    const g2=v=>{ const i=col(v); return i>=0?parseFloat(cells[i]||'0')||0:0; };
+    const fMrkt=g2('Vloer_Markt'), fBs=g2('Vloer_Boschstraat'), fRest=g2('Vloer_Restaurant'), fInt=g2('Vloer_Intern');
+    if(fMrkt>0) DB[yr][mNaam].floors['Markt']=(DB[yr][mNaam].floors['Markt']||0)+fMrkt;
+    if(fBs>0)   DB[yr][mNaam].floors['Boschstraat']=(DB[yr][mNaam].floors['Boschstraat']||0)+fBs;
+    if(fRest>0) DB[yr][mNaam].floors['Restaurant']=(DB[yr][mNaam].floors['Restaurant']||0)+fRest;
+    if(fInt>0)  DB[yr][mNaam].floors['Intern']=(DB[yr][mNaam].floors['Intern']||0)+fInt;
+  });
+}
+
+// Laad status tonen
+function setLoadStatus(msg, ok=null){
+  const el=document.getElementById('loadStatus');
+  if(!el) return;
+  el.textContent=msg;
+  el.style.background=ok===true?'rgba(29,158,117,.15)':ok===false?'rgba(201,76,76,.12)':'rgba(13,27,42,.06)';
+  el.style.color=ok===true?'var(--green)':ok===false?'var(--red)':'var(--muted)';
+  el.style.display='block';
+  if(ok!==null) setTimeout(()=>{if(el)el.style.display='none';},4000);
+}
+
+async function loadFromSheets(){
+  setLoadStatus('⏳ Verbinding maken met Google Sheets...');
+  try{
+    // Laad Maand_Omzet
+    const r1=await fetch(SHEETS_BASE+'Maand_Omzet',{cache:'no-cache'});
+    if(!r1.ok) throw new Error('Maand_Omzet niet bereikbaar');
+    const csv1=await r1.text();
+    if(csv1.includes('Unauthorized')||csv1.includes('not found')) throw new Error('Sheets niet publiek of verkeerd ID');
+    parseMaandCSV(csv1);
+    setLoadStatus('📊 Maandomzet geladen, dagdata ophalen...');
+
+    // Laad Dag_Omzet
+    const r2=await fetch(SHEETS_BASE+'Dag_Omzet',{cache:'no-cache'});
+    if(r2.ok){
+      const csv2=await r2.text();
+      if(!csv2.includes('Unauthorized')) parseDagCSV(csv2);
+    }
+
+    setLoadStatus('✅ Live data geladen vanuit Google Sheets', true);
+    document.getElementById('dataSourceBadge').textContent='● Live · Sheets';
+    document.getElementById('dataSourceBadge').style.background='rgba(29,158,117,.15)';
+    document.getElementById('dataSourceBadge').style.color='var(--green)';
+  }catch(err){
+    console.warn('Sheets laden mislukt:', err.message);
+    setLoadStatus('⚠️ Sheets niet bereikbaar — lokale data gebruikt', false);
+    document.getElementById('dataSourceBadge').textContent='● Lokale data';
+  }
+}
+
+function loadData(){
+  // 1. Laad lokale opslag als fallback
+  try{ const s=localStorage.getItem('capital_db_v4'); if(s) DB=JSON.parse(s); }catch(e){DB={};}
+  try{ const s=localStorage.getItem('capital_daylogs'); if(s) DAYLOGS=JSON.parse(s); }catch(e){DAYLOGS={};}
+
+  // 2. Merge BUILTIN als basis
+  Object.entries(BUILTIN).forEach(([yr,ms])=>{
+    if(!DB[yr]) DB[yr]={};
+    Object.entries(ms).forEach(([m,d])=>{ if(!DB[yr][m]) DB[yr][m]=d; });
+  });
+}
+
+async function initDashboard(){
+  // Eerst BUILTIN laden en dashboard tonen
+  loadData();
+  render('overzicht');
+
+  // Dan asynchroon Sheets laden en herdekenen
+  await loadFromSheets();
+
+  // Na Sheets laden: herlaad huidige pagina met nieuwe data
+  render(curPage);
+}
+
+function saveData(){ try{ localStorage.setItem('capital_db_v4',JSON.stringify(DB)); localStorage.setItem('capital_daylogs',JSON.stringify(DAYLOGS)); }catch(e){} }
+
+function getYears(){ return Object.keys(DB).filter(yr=>Object.keys(DB[yr]).length>0).sort(); }
+function getMths(yr){ return MONTHS.filter(m=>DB[yr]?.[m]); }
+function getDOW(yr,m,d){ return WDN[new Date(+yr,MNUM[m]-1,+d).getDay()]; }
+function getDayCount(yr,m){ return new Date(+yr,MNUM[m],0).getDate(); }
+function allDays(yr,mFilter){
+  const res=[];
+  const ms=mFilter?[mFilter]:getMths(yr);
+  ms.forEach(m=>{ if(!DB[yr]?.[m]) return; Object.entries(DB[yr][m].days).forEach(([d,[v,t]])=>{ if(v>0) res.push({yr:+yr,m,d:+d,v,t,feast:gf(+yr,m,+d)}); }); });
+  return res;
+}
+function weekTotals(yr){
+  const wks={}; if(!DB[yr]) return [];
+  getMths(yr).forEach(m=>{ const mn=MNUM[m]; Object.entries(DB[yr][m].days).forEach(([d,[v]])=>{ if(!v) return; const dt=new Date(+yr,mn-1,+d); const jan1=new Date(+yr,0,1); const wk=Math.ceil(((dt-jan1)/86400000+((jan1.getDay()+6)%7)+1)/7); const k=`W${String(wk).padStart(2,'0')}`; if(!wks[k]) wks[k]={k,v:0,wk}; wks[k].v+=v; }); });
+  return Object.values(wks).filter(w=>w.v>0).sort((a,b)=>a.wk-b.wk);
+}
+function avgDayRev(yr,m){
+  if(!DB[yr]?.[m]) return 0;
+  const days=Object.values(DB[yr][m].days).filter(([v])=>v>0);
+  return days.length ? days.reduce((s,[v])=>s+v,0)/days.length : 0;
+}
+
+// Chart registry
+const CHARTS={};
+function mkChart(id,cfg){ if(CHARTS[id]){CHARTS[id].destroy();} const el=document.getElementById(id); if(!el) return; CHARTS[id]=new Chart(el,cfg); }
+
+const vlinePlugin={id:'vl',afterDraw(chart,_,opts){
+  if(!opts?.lines?.length) return;
+  const{ctx,chartArea:ca,scales:sc}=chart; ctx.save();
+  opts.lines.forEach(l=>{ const idx=chart.data.labels.indexOf(String(l.d)); if(idx<0) return; const x=sc.x.getPixelForValue(idx); ctx.beginPath(); ctx.setLineDash([3,3]); ctx.strokeStyle=l.c||'#ff5a5a'; ctx.lineWidth=1.5; ctx.moveTo(x,ca.top); ctx.lineTo(x,ca.bottom); ctx.stroke(); ctx.setLineDash([]); ctx.save(); ctx.translate(x+2,ca.top+4); ctx.rotate(Math.PI/2); ctx.fillStyle=l.c||'#C94C4C'; ctx.font='bold 9px DM Sans'; ctx.fillText((l.n||'').substring(0,9),0,0); ctx.restore(); });
+  ctx.restore();
+}};
+Chart.register(vlinePlugin);
+
+const vakBandPlugin={id:'vakBands',beforeDraw(chart,_,opts){
+  if(!opts?.bands?.length) return;
+  const{ctx,chartArea:ca,scales:sc}=chart;
+  ctx.save();
+  opts.bands.forEach(b=>{
+    const x1=sc.x.getPixelForValue(b.s-1);
+    const x2=sc.x.getPixelForValue(b.e-1);
+    ctx.fillStyle='rgba(34,201,122,0.07)';
+    ctx.fillRect(x1,ca.top,x2-x1,ca.bottom-ca.top);
+    ctx.fillStyle='rgba(34,201,122,0.5)';
+    ctx.fillRect(x1,ca.top,1,ca.bottom-ca.top);
+    ctx.fillRect(x2,ca.top,1,ca.bottom-ca.top);
+  });
+  ctx.restore();
+}};
+Chart.register(vakBandPlugin);
+
+
+const CHART_OPTS = {
+  responsive:true, maintainAspectRatio:false,
+  plugins:{ legend:{display:false}, tooltip:{backgroundColor:'#0D1B2A',borderColor:'rgba(13,27,42,.1)',borderWidth:1,titleColor:'rgba(255,255,255,.6)',bodyColor:'#F5E4B0',titleFont:{family:'DM Sans',size:10},bodyFont:{family:'DM Mono',size:11}} },
+  scales:{
+    y:{ ticks:{callback:v=>'€'+Math.round(v/1000)+'k',color:'#7A7A6E',font:{size:10,family:'DM Sans'}}, grid:{color:'rgba(13,27,42,.05)'}, border:{dash:[4,4],color:'transparent'} },
+    x:{ grid:{display:false}, ticks:{color:'#7A7A6E',font:{size:9,family:'DM Sans'}} }
+  }
+};
+function co(extra={}){ return JSON.parse(JSON.stringify({...CHART_OPTS,...extra})); }
+
+// ─── NAVIGATION ─────────────────────────────────────────────────────────────
+let curPage='overzicht';
+function nav(p, el){
+  curPage=p;
+  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+  document.getElementById('page-'+p)?.classList.add('active');
+  document.querySelectorAll('.tabitem').forEach(x=>x.classList.remove('active'));
+  if(el) el.classList.add('active');
+  else { document.querySelectorAll('.tabitem').forEach(x=>{ if(x.getAttribute('onclick')?.includes(`'${p}'`)) x.classList.add('active'); }); }
+  const nd=document.getElementById('navDate');
+  if(nd) nd.textContent=new Date().toLocaleDateString('nl-NL',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
+  render(p);
+}
+
+// ─── PILLS HELPER ────────────────────────────────────────────────────────────
+function pills(items,active,fn,isYear=false){
+  return `<div class="pills">${items.map(it=>`<button class="pill ${it==active?'active':''}" onclick="${fn}('${it}')">${isYear&&['2020','2021','2022','2023','2024','2025','2026','2027'].includes(String(it))?yrBadge(it)+' ':it}</button>`).join('')}</div>`;
+}
+
+// ─── OVERZICHT ───────────────────────────────────────────────────────────────
+
+function renderOverzicht(){
+  const yrs=getYears();
+  const totals=yrs.map(yr=>({yr,v:getMths(yr).reduce((s,m)=>s+DB[yr][m].total,0)}));
+  const tickets=yrs.map(yr=>({yr,v:getMths(yr).reduce((s,m)=>s+DB[yr][m].tickets,0)}));
+  const tips=yrs.map(yr=>({yr,v:getMths(yr).reduce((s,m)=>s+(DB[yr][m].pay?.tips||0),0)}));
+
+  const best25=Object.entries(DB['2025']||{}).reduce((best,[m,d])=>d.total>best.v?{m,v:d.total}:best,{m:'',v:0});
+  const best26=Object.entries(DB['2026']||{}).reduce((best,[m,d])=>d.total>best.v?{m,v:d.total}:best,{m:'',v:0});
+  const t25=totals.find(x=>x.yr==='2025')?.v||0;
+  const t26=totals.find(x=>x.yr==='2026')?.v||0;
+  const p=pct(t26,t25);
+  const allDays25=allDays('2025'); const hiDay=allDays25.length?allDays25.reduce((a,b)=>a.v>b.v?a:b):null;
+  const avgTick25=tickets.find(x=>x.yr==='2025'); const avgTick26=tickets.find(x=>x.yr==='2026');
+
+  const el=document.getElementById('page-overzicht');
+  el.innerHTML=`
+  <div class="page-header"><div><div class="page-title">Overzicht</div><div class="page-sub">Capital (Bagus B.V.) — Maastricht</div></div></div>
+  <div class="metrics">
+    <div class="metric-card info"><div class="mc-label">Omzet <span class="yr-badge yr-2026">2026</span> YTD</div><div class="mc-value">${fmt(t26)}</div><div class="mc-sub ${p&&p>=0?'up':'dn'}">${ps(p)} vs 2025 YTD</div></div>
+    <div class="metric-card"><div class="mc-label">Omzet <span class="yr-badge yr-2025">2025</span> volledig jaar</div><div class="mc-value">${fmt(t25)}</div><div class="mc-sub">12 maanden</div></div>
+    <div class="metric-card hi"><div class="mc-label">Beste maand <span class="yr-badge yr-2025">2025</span></div><div class="mc-value">${best25.m||'–'}</div><div class="mc-sub">${fmt(best25.v)}</div></div>
+    <div class="metric-card warn"><div class="mc-label">Totaal fooi <span class="yr-badge yr-2025">2025</span></div><div class="mc-value">${fmt(tips.find(x=>x.yr==='2025')?.v||0)}</div><div class="mc-sub">${((tips.find(x=>x.yr==='2025')?.v||0)/t25*100).toFixed(1)}% van omzet</div></div>
+  </div>
+  <div class="panels panels-2">
+    <div class="panel">
+      <div class="panel-title">Maandomzet per jaar
+        <div class="legend">${yrs.map(yr=>`<span class="leg-item"><span class="leg-dot" style="background:${cyrc(yr)}"></span>${yr}</span>`).join('')}</div>
+      </div>
+      <div class="ch" style="height:200px"><canvas id="ovMaandC" role="img" aria-label="Maandomzet">Maandomzet</canvas></div>
+    </div>
+    <div class="panel">
+      <div class="panel-title">Gem. besteding per ticket</div>
+      <div class="ch" style="height:200px"><canvas id="ovTickC" role="img" aria-label="Gem ticket">Gem ticket</canvas></div>
+    </div>
+  </div>
+  <div class="panels panels-2">
+    <div class="panel">
+      <div class="panel-title">Weekomzet 2025 vs 2026</div>
+      <div class="ch" style="height:160px"><canvas id="ovWeekC" role="img" aria-label="Weekomzet">Weekomzet</canvas></div>
+    </div>
+    <div class="panel">
+      <div class="panel-title">Top 5 hoogste dagen ooit</div>
+      <div id="ovTopDays"></div>
+    </div>
+  </div>`;
+
+  // Maand chart
+  const maandDS=yrs.map(yr=>({label:yr,data:MONTHS.map(m=>DB[yr]?.[m]?.total||0),backgroundColor:cyrc(yr),borderRadius:4,borderSkipped:false}));
+  setTimeout(()=>{ mkChart('ovMaandC',{type:'bar',data:{labels:MONTHS.map(m=>m.substring(0,3)),datasets:maandDS},options:{...co(),plugins:{...co().plugins,tooltip:{...co().plugins.tooltip,callbacks:{label:c=>c.dataset.label+': '+fmt(c.raw)}}}}}); },30);
+
+  // Gem ticket chart
+  const tickDS=yrs.map(yr=>({label:yr,data:getMths(yr).map(m=>{const d=DB[yr][m];return d.tickets>0?Math.round(d.total/d.tickets*100)/100:0;}),borderColor:cyrc(yr),backgroundColor:cyrc(yr)+'22',fill:false,tension:.4,pointRadius:3,borderWidth:2,spanGaps:false}));
+  const tickLabels=[...new Set(yrs.flatMap(yr=>getMths(yr)))].sort((a,b)=>MNUM[a]-MNUM[b]);
+  setTimeout(()=>{ mkChart('ovTickC',{type:'line',data:{labels:tickLabels.map(m=>m.substring(0,3)),datasets:tickDS},options:{...co(),scales:{y:{...co().scales.y,ticks:{...co().scales.y.ticks,callback:v=>'€'+Math.round(v)}},x:co().scales.x}}}); },30);
+
+  // Week chart
+  const wkDS=yrs.map(yr=>{ const wks=weekTotals(yr); const maxLen=52; return {label:yr,data:Array.from({length:maxLen},(_,i)=>wks[i]?.v||null),borderColor:cyrc(yr),backgroundColor:cyrc(yr)+'18',fill:true,tension:.3,pointRadius:1.5,borderWidth:1.5,spanGaps:true}; });
+  setTimeout(()=>{ mkChart('ovWeekC',{type:'line',data:{labels:Array.from({length:52},(_,i)=>`W${String(i+1).padStart(2,'0')}`),datasets:wkDS},options:{...co(),scales:{y:{...co().scales.y},x:{...co().scales.x,ticks:{...co().scales.x.ticks,autoSkip:true,maxTicksLimit:13}}}}}); },30);
+
+  // Top days
+  const allD=yrs.flatMap(yr=>allDays(yr));
+  const top5=allD.sort((a,b)=>b.v-a.v).slice(0,5);
+  const maxV=top5[0]?.v||1;
+  document.getElementById('ovTopDays').innerHTML=top5.map((x,i)=>`
+    <div class="bar-row"><div class="br-rank">${i+1}</div><div class="br-label">${getDOW(x.yr,x.m,x.d)} ${x.d} ${x.m.substring(0,3)} '${String(x.yr).slice(2)}${x.feast?` <span class="badge badge-feast">${x.feast.substring(0,8)}</span>`:''}</div><div class="br-track"><div class="br-fill" style="width:${Math.round(x.v/maxV*100)}%;background:var(--green)"></div></div><div class="br-val" style="color:var(--green)">${fmt(x.v)}</div></div>`).join('');
+}
+
+// ─── DAGOMZET ────────────────────────────────────────────────────────────────
+const dagS={yr:'2026',m:'Januari'};
+
+function renderDag(){
+  const yrs=getYears(); const ms=getMths(dagS.yr);
+  if(!ms.includes(dagS.m)) dagS.m=ms[0]||'Januari';
+  const nDays=Math.max(...yrs.filter(yr=>DB[yr]?.[dagS.m]).map(yr=>getDayCount(yr,dagS.m)));
+  const labels=Array.from({length:nDays},(_,i)=>String(i+1));
+  const datasets=yrs.filter(yr=>DB[yr]?.[dagS.m]).map(yr=>({label:yr,data:labels.map(d=>DB[yr][dagS.m].days[d]?.[0]||0),backgroundColor:cyrc(yr),borderRadius:2,borderSkipped:false}));
+  const lines=[
+    ...(FEASTS[2025]?.[dagS.m]||[]).map(f=>({d:f.d,n:f.n,c:'#f5a623'})),
+    ...(FEASTS[2026]?.[dagS.m]||[]).map(f=>({d:f.d,n:f.n,c:'#ff5a5a'})),
+    ...(EVENEMENTEN['2025']||[]).filter(e=>e.m===dagS.m&&e.impact!=='laag').map(e=>({d:e.s,n:e.name.substring(0,12),c:EV_COLORS[e.type]||'#34d399'})),
+    ...(EVENEMENTEN['2026']||[]).filter(e=>e.m===dagS.m&&e.impact!=='laag').map(e=>({d:e.s,n:e.name.substring(0,12),c:EV_COLORS[e.type]||'#34d399'})),
+  ];
+
+  // Avg besteding per dag
+  const tickDS=yrs.filter(yr=>DB[yr]?.[dagS.m]).map(yr=>({label:yr,data:labels.map(d=>{ const day=DB[yr][dagS.m].days[d]; return (day&&day[1]>0)?Math.round(day[0]/day[1]*100)/100:0; }),borderColor:cyrc(yr),backgroundColor:'transparent',type:'line',tension:.4,pointRadius:2,borderWidth:1.5,yAxisID:'y2',spanGaps:true}));
+
+  const el=document.getElementById('page-dag');
+  el.innerHTML=`
+  <div class="page-header"><div><div class="page-title">Dagomzet</div></div></div>
+  ${pills(yrs,dagS.yr,'setDagYr',true)}${pills(ms,dagS.m,'setDagM')}
+  <div class="legend">
+    ${yrs.map(yr=>`<span class="leg-item"><span class="leg-dot" style="background:${cyrc(yr)}"></span>${yr} (bars)</span>`).join('')}
+    <span class="leg-item"><span class="leg-line" style="border-color:#f5a623"></span>feestdag '25</span>
+    <span class="leg-item"><span class="leg-line" style="border-color:#ff5a5a"></span>feestdag '26</span>
+    <span class="leg-item"><span class="leg-dot" style="background:#a78bfa;border-radius:50%"></span>gem. ticket (lijn)</span>
+  </div>
+  <div class="panel"><div class="ch" style="height:220px"><canvas id="dagC" role="img" aria-label="Dagomzet">Dagomzet</canvas></div></div>
+  <div style="font-size:10px;color:var(--muted);margin:8px 0 12px;">${lines.map(l=>`<span class="badge" style="background:${l.c}22;color:${l.c};margin-right:4px">${l.d}/${MNUM[dagS.m]}: ${l.n}</span>`).join('')}</div>
+  <div class="panels panels-2">
+    <div class="panel"><div class="panel-title">Gem. besteding per ticket</div><div class="ch" style="height:140px"><canvas id="dagTickC" role="img" aria-label="Ticket gem">Ticket</canvas></div></div>
+    <div class="panel"><div class="panel-title">Dag ranking (open dagen)</div><div id="dagRanking"></div></div>
+  </div>`;
+
+  setTimeout(()=>{
+    const opts=co(); opts.plugins.vl={lines};
+    const vakBands=(VAKANTIES[dagS.yr]||[]).filter(v=>v.m===dagS.m).map(v=>({s:v.s,e:v.e}));
+    if(vakBands.length) opts.plugins.vakBands={bands:vakBands};
+    opts.scales.y2={position:'right',ticks:{callback:v=>'€'+Math.round(v),color:'#7A7A6E',font:{size:9}},grid:{display:false}};
+    mkChart('dagC',{type:'bar',data:{labels,datasets:[...datasets,...tickDS]},options:{...opts,scales:{...opts.scales,x:{...opts.scales.x,ticks:{...opts.scales.x.ticks,autoSkip:false,maxRotation:0,font:{size:8}}}}}});
+    // Ticket avg chart
+    const tickAvgDS=yrs.filter(yr=>DB[yr]?.[dagS.m]).map(yr=>({label:yr,data:labels.map(d=>{ const day=DB[yr][dagS.m].days[d]; return (day&&day[1]>0)?Math.round(day[0]/day[1]*100)/100:null; }),borderColor:cyrc(yr),backgroundColor:cyrc(yr)+'15',fill:true,tension:.4,pointRadius:2,borderWidth:1.5,spanGaps:true}));
+    const tickOpts=co(); tickOpts.scales.y.ticks.callback=v=>'€'+Math.round(v);
+    mkChart('dagTickC',{type:'line',data:{labels,datasets:tickAvgDS},options:{...tickOpts,scales:{...tickOpts.scales,x:{...tickOpts.scales.x,ticks:{...tickOpts.scales.x.ticks,autoSkip:true,maxTicksLimit:10}}}}});
+  },30);
+
+  // Ranking
+  const all=allDays(dagS.yr,dagS.m).sort((a,b)=>b.v-a.v).slice(0,8);
+  const maxV=all[0]?.v||1;
+  document.getElementById('dagRanking').innerHTML=all.map((x,i)=>`<div class="bar-row"><div class="br-rank">${i+1}</div><div class="br-label">${getDOW(x.yr,x.m,x.d)} ${x.d}${x.feast?` <span class="badge badge-feast">${x.feast.substring(0,7)}</span>`:''}</div><div class="br-track"><div class="br-fill" style="width:${Math.round(x.v/maxV*100)}%;background:${cyrc(String(x.yr))}"></div></div><div class="br-val">${fmt(x.v)}</div></div>`).join('');
+}
+
+function renderWeek(){
+  const yrs=getYears();
+  const all=yrs.map(yr=>({yr,wks:weekTotals(yr)}));
+  const maxLen=Math.max(...all.map(x=>x.wks.length),1);
+  const labels=Array.from({length:maxLen},(_,i)=>`W${String(i+1).padStart(2,'0')}`);
+  const datasets=all.filter(x=>x.wks.length).map(({yr,wks})=>({label:yr,data:labels.map((_,i)=>wks[i]?.v||null),borderColor:cyrc(yr),backgroundColor:cyrc(yr)+'18',fill:true,tension:.35,pointRadius:2,borderWidth:1.8,spanGaps:true}));
+
+  const el=document.getElementById('page-week');
+  el.innerHTML=`
+  <div class="page-header"><div><div class="page-title">Weekomzet</div></div></div>
+  <div class="panel" style="margin-bottom:12px">
+    <div class="legend">${yrs.map(yr=>`<span class="leg-item"><span class="leg-dot" style="background:${cyrc(yr)}"></span>${yr}</span>`).join('')}</div>
+    <div class="ch" style="height:220px"><canvas id="weekLineC" role="img" aria-label="Weekomzet">Weekomzet</canvas></div>
+  </div>
+  <div class="panels panels-2">
+    <div class="panel"><div class="panel-title">Top 10 weken (2025)</div><div id="wkTop25"></div></div>
+    <div class="panel"><div class="panel-title">Top 10 weken (2026)</div><div id="wkTop26"></div></div>
+  </div>`;
+  setTimeout(()=>{ mkChart('weekLineC',{type:'line',data:{labels,datasets},options:{...co(),scales:{y:co().scales.y,x:{...co().scales.x,ticks:{...co().scales.x.ticks,autoSkip:true,maxTicksLimit:13}}}}}); },30);
+
+  ['2025','2026'].forEach(yr=>{
+    const wks=weekTotals(yr).sort((a,b)=>b.v-a.v).slice(0,10);
+    const maxV=wks[0]?.v||1;
+    document.getElementById(`wkTop${yr.slice(2)}`).innerHTML=wks.map((x,i)=>`<div class="bar-row"><div class="br-rank">${i+1}</div><div class="br-label">${x.k} ${yrBadge(yr)}</div><div class="br-track"><div class="br-fill" style="width:${Math.round(x.v/maxV*100)}%;background:${cyrc(yr)}"></div></div><div class="br-val">${fmt(x.v)}</div></div>`).join('');
+  });
+}
+
+// ─── MAANDOMZET ──────────────────────────────────────────────────────────────
+
+function renderMaand(){
+  const yrs=getYears();
+  const lineDS=yrs.map(yr=>({label:yr,data:MONTHS.map(m=>DB[yr]?.[m]?.total||null),borderColor:cyrc(yr),backgroundColor:cyrc(yr)+'18',fill:false,tension:.3,pointRadius:3,borderWidth:2,spanGaps:false}));
+  const growthLabels=getMths('2026'); const growthData=growthLabels.map(m=>{ const p=pct(DB['2026'][m]?.total||0,DB['2025']?.[m]?.total||0); return p; });
+
+  const el=document.getElementById('page-maand');
+  el.innerHTML=`
+  <div class="page-header"><div><div class="page-title">Maandomzet</div></div></div>
+  <div class="panel" style="margin-bottom:12px">
+    <div class="legend">${yrs.map(yr=>`<span class="leg-item"><span class="leg-dot" style="background:${cyrc(yr)}"></span>${yr}</span>`).join('')}</div>
+    <div class="ch" style="height:200px"><canvas id="maandLineC" role="img" aria-label="Maandomzet">Maand</canvas></div>
+  </div>
+  <div class="panels panels-2">
+    <div class="panel"><div class="panel-title">Groei ${yrBadge('2026')} vs ${yrBadge('2025')} (%)</div><div class="ch" style="height:150px"><canvas id="maandGrowthC" role="img" aria-label="Groei">Groei</canvas></div></div>
+    <div class="panel"><div class="panel-title">Maand ranking 2025</div><div id="maandRank"></div></div>
+  </div>`;
+  setTimeout(()=>{
+    mkChart('maandLineC',{type:'line',data:{labels:MONTHS.map(m=>m.substring(0,3)),datasets:lineDS},options:{...co(),scales:{y:co().scales.y,x:{...co().scales.x,ticks:{...co().scales.x.ticks,autoSkip:false,maxRotation:0}}}}});
+    mkChart('maandGrowthC',{type:'bar',data:{labels:growthLabels.map(m=>m.substring(0,3)),datasets:[{label:'%',data:growthData,backgroundColor:growthData.map(v=>v>=0?'#22c97a44':'#ff5a5a44'),borderColor:growthData.map(v=>v>=0?'#22c97a':'#ff5a5a'),borderWidth:1.5,borderRadius:4,borderSkipped:false}]},options:{...co(),scales:{y:{...co().scales.y,ticks:{...co().scales.y.ticks,callback:v=>v+'%'}},x:co().scales.x}}});
+  },30);
+  const rank=getMths('2025').map(m=>({m,v:DB['2025'][m].total})).sort((a,b)=>b.v-a.v);
+  const maxV=rank[0]?.v||1;
+  document.getElementById('maandRank').innerHTML=rank.map((x,i)=>`<div class="bar-row"><div class="br-rank">${i+1}</div><div class="br-label">${x.m.substring(0,3)} ${yrBadge('2025')}</div><div class="br-track"><div class="br-fill" style="width:${Math.round(x.v/maxV*100)}%;background:${cyrc('2025')}"></div></div><div class="br-val">${fmt(x.v)}</div></div>`).join('');
+}
+
+// ─── VLOER ───────────────────────────────────────────────────────────────────
+const vloerS={yr:'2025'};
+
+function renderVloer(){
+  const yrs=getYears();
+  const floorNames=['Boschstraat','Markt','Restaurant','Intern'];
+  const el=document.getElementById('page-vloer');
+  el.innerHTML=`
+  <div class="page-header"><div><div class="page-title">Per vloer</div></div></div>
+  ${pills(yrs,vloerS.yr,'setVloerYr',true)}
+  <div class="panels panels-2">
+    <div class="panel"><div class="ch" style="height:220px"><canvas id="vloerLineC" role="img" aria-label="Vloer">Vloer</canvas></div></div>
+    <div class="panel"><div class="panel-title">Aandeel per vloer (jaar)</div>
+      <div class="donut-wrap"><div class="ch" style="height:180px"><canvas id="vloerDonutC" role="img" aria-label="Vloer donut">Donut</canvas></div>
+      <div class="donut-legend" id="vloerLegend"></div></div>
+    </div>
+  </div>`;
+
+  const ms=getMths(vloerS.yr);
+  const FLOOR_COLORS=['#4d9fff','#22c97a','#a78bfa','#f5a623'];
+  const lineDS=floorNames.map((fl,i)=>({label:fl,data:ms.map(m=>DB[vloerS.yr][m]?.floors?.[fl]||0),borderColor:FLOOR_COLORS[i],backgroundColor:FLOOR_COLORS[i]+'18',fill:false,tension:.3,pointRadius:3,borderWidth:1.8,spanGaps:false}));
+  setTimeout(()=>{
+    mkChart('vloerLineC',{type:'line',data:{labels:ms.map(m=>m.substring(0,3)),datasets:lineDS},options:{...co(),plugins:{...co().plugins,legend:{display:false}},scales:{y:co().scales.y,x:{...co().scales.x,ticks:{...co().scales.x.ticks,autoSkip:false,maxRotation:0}}}}});
+    const totals=floorNames.map(fl=>ms.reduce((s,m)=>s+(DB[vloerS.yr][m]?.floors?.[fl]||0),0));
+    const totalAll=totals.reduce((a,b)=>a+b,0);
+    mkChart('vloerDonutC',{type:'doughnut',data:{labels:floorNames,datasets:[{data:totals,backgroundColor:FLOOR_COLORS.map(c=>c+'cc'),borderWidth:0,borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:'#0D1B2A',borderColor:'rgba(13,27,42,.08)',borderWidth:1,titleColor:'#7A7A6E',bodyColor:'#0D1B2A',callbacks:{label:c=>c.label+': '+fmt(c.raw)+' ('+(c.raw/totalAll*100).toFixed(1)+'%)'}}},cutout:'65%'}});
+    document.getElementById('vloerLegend').innerHTML=floorNames.map((fl,i)=>`<div class="donut-leg-item"><span class="donut-leg-dot" style="background:${FLOOR_COLORS[i]}"></span><span class="donut-leg-label">${fl}</span><span class="donut-leg-val">${Math.round(totals[i]/totalAll*100)}%</span></div>`).join('');
+  },30);
+}
+
+function renderBetaling(){
+  const yrs=getYears();
+  const el=document.getElementById('page-betaling');
+  el.innerHTML=`
+  <div class="page-header"><div><div class="page-title">Betalingsmethoden</div></div></div>
+  ${pills(yrs,betS.yr,'setBetYr',true)}
+  <div class="panels panels-2">
+    <div class="panel"><div class="panel-title">Pin vs overig per maand ${yrBadge(betS.yr)}</div><div class="ch" style="height:200px"><canvas id="betBarC" role="img" aria-label="Betalingen">Betalingen</canvas></div></div>
+    <div class="panel"><div class="panel-title">Fooi per maand ${yrBadge(betS.yr)}</div><div class="ch" style="height:200px"><canvas id="betTipsC" role="img" aria-label="Fooi">Fooi</canvas></div></div>
+  </div>
+  <div class="panel" style="margin-top:12px">
+    <div class="panel-title">Overzicht per maand</div>
+    <table class="data-table">
+      <thead><tr><th>Maand</th><th>Jaar</th><th>Totaal</th><th>Pin</th><th>Contant</th><th>Overig</th><th>Fooi</th><th>Fooi %</th></tr></thead>
+      <tbody id="betTable"></tbody>
+    </table>
+  </div>`;
+
+  const ms=getMths(betS.yr);
+  setTimeout(()=>{
+    const pinDS={label:'Pin',data:ms.map(m=>DB[betS.yr][m]?.pay?.pin||0),backgroundColor:'#4d9fff88',borderRadius:3,borderSkipped:false};
+    const othDS={label:'Overig',data:ms.map(m=>DB[betS.yr][m]?.pay?.other||0),backgroundColor:'#a78bfa88',borderRadius:3,borderSkipped:false};
+    mkChart('betBarC',{type:'bar',data:{labels:ms.map(m=>m.substring(0,3)),datasets:[pinDS,othDS]},options:{...co(),plugins:{...co().plugins,legend:{display:true,labels:{color:'#7A7A6E',font:{size:10,family:'DM Sans'},boxWidth:10,boxHeight:10}}},scales:{...co().scales,x:{...co().scales.x,ticks:{...co().scales.x.ticks,autoSkip:false,maxRotation:0}}}}});
+    const tipsDS={label:'Fooi',data:ms.map(m=>DB[betS.yr][m]?.pay?.tips||0),borderColor:'#f5a623',backgroundColor:'#f5a62318',fill:true,tension:.4,pointRadius:3,borderWidth:1.8};
+    mkChart('betTipsC',{type:'line',data:{labels:ms.map(m=>m.substring(0,3)),datasets:[tipsDS]},options:{...co(),scales:{y:co().scales.y,x:{...co().scales.x,ticks:{...co().scales.x.ticks,autoSkip:false,maxRotation:0}}}}});
+  },30);
+
+  document.getElementById('betTable').innerHTML=ms.map(m=>{
+    const d=DB[betS.yr][m]; const pay=d.pay||{};
+    const tipPct=d.total>0?(pay.tips||0)/d.total*100:0;
+    return `<tr><td>${m}</td><td>${yrBadge(betS.yr)}</td><td class="val">${fmt(d.total)}</td><td class="val">${fmt(pay.pin||0)}</td><td class="val">${fmt(Math.max(0,pay.cash||0))}</td><td class="val">${fmt(pay.other||0)}</td><td class="val" style="color:var(--amber)">${fmt(pay.tips||0)}</td><td class="val">${tipPct.toFixed(1)}%</td></tr>`;
+  }).join('');
+}
+
+function renderVat(){
+  const yrs=getYears();
+  const el=document.getElementById('page-vat');
+  el.innerHTML=`
+  <div class="page-header"><div><div class="page-title">BTW-mix analyse</div><div class="page-sub">9% = eten · 21% = drank/overig</div></div></div>
+  ${pills(yrs,vatS.yr,'setVatYr',true)}
+  <div class="metrics">
+    <div class="metric-card info"><div class="mc-label">Netto 9% eten ${yrBadge(vatS.yr)}</div><div class="mc-value">${fmt(getMths(vatS.yr).reduce((s,m)=>s+(DB[vatS.yr][m]?.vat9||0),0))}</div><div class="mc-sub">eten</div></div>
+    <div class="metric-card warn"><div class="mc-label">Netto 21% drank ${yrBadge(vatS.yr)}</div><div class="mc-value">${fmt(getMths(vatS.yr).reduce((s,m)=>s+(DB[vatS.yr][m]?.vat21||0),0))}</div><div class="mc-sub">drank / overig</div></div>
+    <div class="metric-card"><div class="mc-label">Gem. eten-aandeel</div><div class="mc-value" id="vatEtenPct">–</div><div class="mc-sub">van netto omzet</div></div>
+    <div class="metric-card"><div class="mc-label">Drank-groei '26 vs '25</div><div class="mc-value" id="vatDrankGroei">–</div><div class="mc-sub">21% omzet YoY</div></div>
+  </div>
+  <div class="panels panels-2">
+    <div class="panel"><div class="panel-title">9% vs 21% netto per maand</div><div class="ch" style="height:200px"><canvas id="vatBarC" role="img" aria-label="BTW mix">BTW</canvas></div></div>
+    <div class="panel"><div class="panel-title">Drank-aandeel per maand (%)</div><div class="ch" style="height:200px"><canvas id="vatRatioC" role="img" aria-label="Ratio">Ratio</canvas></div></div>
+  </div>`;
+
+  const ms=getMths(vatS.yr);
+  const v9=ms.map(m=>DB[vatS.yr][m]?.vat9||0);
+  const v21=ms.map(m=>DB[vatS.yr][m]?.vat21||0);
+  const ratios=ms.map((m,i)=>{ const tot=v9[i]+v21[i]; return tot>0?Math.round(v21[i]/tot*1000)/10:0; });
+  const totalV9=v9.reduce((a,b)=>a+b,0); const totalV21=v21.reduce((a,b)=>a+b,0); const tot=totalV9+totalV21;
+  document.getElementById('vatEtenPct').textContent=tot>0?(totalV9/tot*100).toFixed(1)+'%':'–';
+
+  // Drank groei YoY
+  const v21_26=getMths('2026').reduce((s,m)=>s+(DB['2026'][m]?.vat21||0),0);
+  const v21_25=getMths('2025').filter(m=>getMths('2026').includes(m)).reduce((s,m)=>s+(DB['2025'][m]?.vat21||0),0);
+  const dg=pct(v21_26,v21_25); document.getElementById('vatDrankGroei').innerHTML=dg!==null?`<span class="${dg>=0?'up':'dn'}">${ps(dg)}</span>`:'–';
+
+  setTimeout(()=>{
+    mkChart('vatBarC',{type:'bar',data:{labels:ms.map(m=>m.substring(0,3)),datasets:[{label:'9% eten',data:v9,backgroundColor:'#22c97a55',borderColor:'#22c97a',borderWidth:1,borderRadius:3,borderSkipped:false},{label:'21% drank',data:v21,backgroundColor:'#f5a62355',borderColor:'#f5a623',borderWidth:1,borderRadius:3,borderSkipped:false}]},options:{...co(),plugins:{...co().plugins,legend:{display:true,labels:{color:'#7A7A6E',font:{size:10,family:'DM Sans'},boxWidth:10,boxHeight:10}}},scales:{...co().scales,x:{...co().scales.x,ticks:{...co().scales.x.ticks,autoSkip:false,maxRotation:0}}}}});
+    mkChart('vatRatioC',{type:'line',data:{labels:ms.map(m=>m.substring(0,3)),datasets:[{label:'Drank%',data:ratios,borderColor:'#f5a623',backgroundColor:'#f5a62318',fill:true,tension:.4,pointRadius:3,borderWidth:2}]},options:{...co(),scales:{y:{...co().scales.y,min:0,max:100,ticks:{...co().scales.y.ticks,callback:v=>v+'%'}},x:{...co().scales.x,ticks:{...co().scales.x.ticks,autoSkip:false,maxRotation:0}}}}});
+  },30);
+}
+
+function renderFeest(){
+  const yrs=getYears();
+  const allF=new Map();
+  yrs.forEach(yr=>{Object.entries(FEASTS[+yr]||{}).forEach(([m,list])=>{list.forEach(f=>{if(!allF.has(f.n))allF.set(f.n,{name:f.n,e:new Map()});const v=DB[yr]?.[m]?.days?.[f.d]?.[0]||0;allF.get(f.n).e.set(yr,{m,d:f.d,v});});});});
+  const names=[...allF.keys()];
+
+  const el=document.getElementById('page-feest');
+  el.innerHTML=`
+  <div class="page-header"><div><div class="page-title">Feestdagen</div></div></div>
+  ${pills(['bar','lijn','tabel'],feestS.mode,'setFeestMode')}
+  <div id="feestContent"></div>`;
+
+  const cont=document.getElementById('feestContent');
+  if(feestS.mode==='bar'){
+    const ds=yrs.map(yr=>({label:yr,data:names.map(n=>allF.get(n).e.get(yr)?.v||0),backgroundColor:cyrc(yr),borderRadius:3,borderSkipped:false}));
+    cont.innerHTML=`<div class="legend">${yrs.map(yr=>`<span class="leg-item"><span class="leg-dot" style="background:${cyrc(yr)}"></span>${yr}</span>`).join('')}</div><div class="panel"><div class="ch" style="height:${Math.max(200,names.length*32+60)}px"><canvas id="feestBarC" role="img" aria-label="Feestdag omzet">Feestdag</canvas></div></div>`;
+    setTimeout(()=>mkChart('feestBarC',{type:'bar',data:{labels:names,datasets:ds},options:{...co(),indexAxis:'y',scales:{x:{...co().scales.x,ticks:{...co().scales.x.ticks,callback:v=>'€'+Math.round(v/1000)+'k'},grid:co().scales.y.grid},y:{...co().scales.y,grid:{display:false}}}}}),30);
+  } else if(feestS.mode==='lijn'){
+    const ds=yrs.map(yr=>({label:yr,data:names.map(n=>allF.get(n).e.get(yr)?.v||null),borderColor:cyrc(yr),backgroundColor:cyrc(yr)+'22',fill:false,tension:.3,pointRadius:4,borderWidth:2,spanGaps:false}));
+    cont.innerHTML=`<div class="legend">${yrs.map(yr=>`<span class="leg-item"><span class="leg-dot" style="background:${cyrc(yr)}"></span>${yr}</span>`).join('')}</div><div class="panel"><div class="ch" style="height:220px"><canvas id="feestLineC" role="img" aria-label="Feestdag lijn">Feestdag lijn</canvas></div></div>`;
+    setTimeout(()=>mkChart('feestLineC',{type:'line',data:{labels:names,datasets:ds},options:{...co(),scales:{y:co().scales.y,x:{...co().scales.x,ticks:{...co().scales.x.ticks,font:{size:9},maxRotation:30}}}}}),30);
+  } else {
+    cont.innerHTML=`<div class="panel"><table class="data-table"><thead><tr><th>Feestdag</th>${yrs.map(yr=>`<th style="color:${cyrc(yr)}">${yr} (datum)</th><th style="color:${cyrc(yr)}">${yr} (omzet)</th>`).join('')}</tr></thead><tbody>${names.map(n=>{const e=allF.get(n);return`<tr><td>${n}</td>${yrs.map(yr=>{const entry=e.e.get(yr);return`<td>${yrBadge(yr)} ${entry?`${entry.d}/${MNUM[entry.m]}`:'–'}</td><td class="val">${entry?.v>0?fmt(entry.v):'–'}</td>`;}).join('')}</tr>`;}).join('')}</tbody></table></div>`;
+  }
+}
+
+function renderPrognose(){
+  const el=document.getElementById('page-prognose');
+  const upcoming=MONTHS.filter(m=>!getMths('2026').includes(m)||m==='April');
+  el.innerHTML=`
+  <div class="page-header"><div><div class="page-title">Prognose <span class="yr-badge yr-2026">2026</span></div><div class="page-sub">Gebaseerd op 2025 patroon + feestdagen correctie</div></div></div>
+  ${pills(upcoming,progS.m,'setProgM')}
+  <div class="metrics" id="progMetrics"></div>
+  <div class="panel" style="margin-bottom:12px"><div class="panel-title">Verwachte vs actuele dagomzet</div><div class="ch" style="height:200px"><canvas id="progC" role="img" aria-label="Prognose">Prognose</canvas></div></div>
+  <div class="panel"><div class="panel-title">Dagverwachting ${progS.m} 2026</div><div id="progTable"></div></div>`;
+  buildPrognose();
+}
+
+function renderDaglog(){
+  const yrs=getYears();
+  const ms=getMths(daglogS.yr).length?getMths(daglogS.yr):MONTHS.slice(0,4);
+  const el=document.getElementById('page-daglog');
+  el.innerHTML=`
+  <div class="page-header"><div><div class="page-title">Dagrapporten</div><div class="page-sub">Voer dagelijks de omzet in. Bij maandrapport worden afwijkingen gemarkeerd.</div></div></div>
+  ${pills(yrs,daglogS.yr,'setDaglogYr',true)}${pills(ms,daglogS.m,'setDaglogM')}
+  <div class="panel">
+    <div class="panel-title" style="display:flex;align-items:center;justify-content:space-between">
+      Daglog ${daglogS.m} <span class="yr-badge yr-${daglogS.yr}">${daglogS.yr}</span>
+      <button class="btn btn-primary" style="padding:4px 12px;font-size:11px" onclick="openDayEntry()">+ Dag invoeren</button>
+    </div>
+    <div id="daglogContent"></div>
+  </div>
+  <div id="conflictPanel"></div>`;
+  buildDaglogContent();
+}
+
+function buildDaglogContent(){
+  const yr=daglogS.yr; const m=daglogS.m;
+  const nDays=getDayCount(+yr,m);
+  const logData=(DAYLOGS[yr]?.[m])||{};
+  const monthData=DB[yr]?.[m];
+  let conflicts=[];
+
+  let rows='';
+  for(let d=1;d<=nDays;d++){
+    const log=logData[d]; const monthly=monthData?.days?.[d];
+    const logV=log?.rev||null; const monthV=monthly?.[0]||null;
+    const hasConflict=logV!==null&&monthV!==null&&monthV>0&&Math.abs(logV-monthV)>0.5;
+    if(hasConflict) conflicts.push({d,logV,monthV});
+    const feast=gf(+yr,m,d);
+    rows+=`<div class="daylog-row ${hasConflict?'conflict':''}">
+      <div style="color:var(--text2)">${getDOW(+yr,m,d)} ${d}/${MNUM[m]} ${yrBadge(yr)}${getEv(+yr,m,d)?` <span style='background:rgba(52,211,153,.15);color:#6ee7b7;font-size:9px;padding:1px 4px;border-radius:3px'>${getEv(+yr,m,d).substring(0,10)}</span>`:''}${isVak(+yr,m,d)?` <span class='badge badge-vak' style='background:rgba(34,201,122,.15);color:#6ee7b7;font-size:9px;padding:1px 4px;border-radius:3px'>${isVak(+yr,m,d).substring(0,8)}</span>`:''}${feast?` <span class="badge badge-feast">${feast.substring(0,7)}</span>`:''}</div>
+      <div style="background:var(--cream2);border-radius:4px;height:8px;overflow:hidden;margin:0 4px">
+        ${logV?`<div style="height:100%;background:var(--blue);border-radius:4px;width:${Math.round(logV/(Math.max(...Object.values(logData).map(x=>x.rev),monthData?Math.max(...Object.values(monthData.days).map(([v])=>v)):1,1))*100)}%"></div>`:''}
+      </div>
+      <div style="font-family:'DM Mono',monospace;font-size:11px;color:${logV?'var(--text)':'var(--text3)'}">
+        ${logV?fmt(logV):'<span style="color:var(--muted)">niet ingevoerd</span>'}
+      </div>
+      <div style="font-size:10px;color:${monthV&&monthV>0?'var(--text2)':'var(--text3)'}">
+        ${monthV&&monthV>0?fmt(monthV)+' (maand)':'–'}
+      </div>
+      <div style="font-size:10px;${hasConflict?'color:var(--red)':'color:var(--muted)'}">
+        ${hasConflict?'⚠ afwijking':''}
+      </div>
+      <div>
+        <button onclick="editDayEntry(${d})" style="font-size:9px;padding:2px 7px;background:var(--cream);border:1px solid var(--border2);border-radius:4px;color:var(--text2);cursor:pointer;font-family:inherit">edit</button>
+      </div>
+    </div>`;
+  }
+  document.getElementById('daglogContent').innerHTML=rows;
+
+  // Conflict panel
+  const dot=document.getElementById('conflictDot');
+  if(dot) dot.style.display=conflicts.length?'inline-block':'none';
+  if(conflicts.length){
+    document.getElementById('conflictPanel').innerHTML=`
+    <div class="panel" style="margin-top:12px;border-color:rgba(255,90,90,.3)">
+      <div class="panel-title" style="color:var(--red)">Afwijkingen gevonden (${conflicts.length})</div>
+      <table class="data-table"><thead><tr><th>Dag</th><th>Dagrapport</th><th>Maandrapport</th><th>Verschil</th></tr></thead>
+      <tbody>${conflicts.map(c=>`<tr><td>${c.d}/${MNUM[daglogS.m]}</td><td>${yrBadge(daglogS.yr)}</td><td class="val">${fmt(c.logV)}</td><td class="val">${fmt(c.monthV)}</td><td class="val dn">${fmt(Math.abs(c.logV-c.monthV))}</td></tr>`).join('')}</tbody></table>
+    </div>`;
+  } else {
+    document.getElementById('conflictPanel').innerHTML='';
+  }
+}
+
+let editingDay=null;
+
+function renderRecords(){
+  const yrs=getYears();
+  const ms=['all',...getMths(recS.yr)];
+  const el=document.getElementById('page-records');
+  el.innerHTML=`
+  <div class="page-header"><div><div class="page-title">Records</div></div></div>
+  ${pills(['dag','week','maand'],recS.scope,'setRecScope')}
+  ${pills(yrs,recS.yr,'setRecYr',true)}
+  ${recS.scope==='dag'?pills(ms,recS.m,'setRecM'):''}
+  <div id="recContent"></div>`;
+  buildRecContent();
+}
+
+function buildRecContent(){
+  const yr=recS.yr; const cont=document.getElementById('recContent');
+  if(!cont) return;
+  if(recS.scope==='dag'){
+    let days=allDays(yr,recS.m==='all'?null:recS.m);
+    if(!days.length){cont.innerHTML='<div style="padding:1rem;color:var(--muted)">Geen data</div>';return;}
+    const top=[...days].sort((a,b)=>b.v-a.v).slice(0,12);
+    const bot=[...days].sort((a,b)=>a.v-b.v).slice(0,8);
+    const hi=top[0]; const lo=bot[0];
+    const fa=x=>x.feast?` <span class="badge badge-feast">${x.feast.substring(0,8)}</span>`:'';
+    cont.innerHTML=`
+    <div class="hl-grid"><div class="hl-hi"><div class="hl-label">Hoogste dag ${yrBadge(recS.yr)}</div><div class="hl-val">${fmt(hi.v)}</div><div class="hl-date">${getDOW(hi.yr,hi.m,hi.d)} ${hi.d} ${hi.m}${fa(hi)}</div></div><div class="hl-lo"><div class="hl-label">Laagste dag ${yrBadge(recS.yr)}</div><div class="hl-val">${fmt(lo.v)}</div><div class="hl-date">${getDOW(lo.yr,lo.m,lo.d)} ${lo.d} ${lo.m}${fa(lo)}</div></div></div>
+    <div class="panels panels-2">
+      <div class="panel"><div class="panel-title">Top 12 hoogste dagen</div><div class="ch" style="height:${12*28+50}px"><canvas id="recTopC" role="img" aria-label="Top dagen">Top</canvas></div></div>
+      <div class="panel"><div class="panel-title">Laagste 8 dagen</div><div class="ch" style="height:${8*28+50}px"><canvas id="recBotC" role="img" aria-label="Laagste">Laag</canvas></div></div>
+    </div>`;
+    setTimeout(()=>{
+      const hOpts=co(); hOpts.indexAxis='y'; hOpts.scales={x:{...co().scales.y,ticks:{...co().scales.y.ticks,callback:v=>'€'+Math.round(v/1000)+'k'}},y:{...co().scales.x,grid:{display:false}}};
+      mkChart('recTopC',{type:'bar',data:{labels:top.map(x=>`${x.d} ${x.m.substring(0,3)} '${String(x.yr).slice(2)}`),datasets:[{data:top.map(x=>x.v),backgroundColor:top.map(x=>x.feast?'#f5a62388':'#22c97a55'),borderColor:top.map(x=>x.feast?'#f5a623':'#22c97a'),borderWidth:1.5,borderRadius:3,borderSkipped:false}]},options:hOpts});
+      const lOpts=co(); lOpts.indexAxis='y'; lOpts.scales={x:{...co().scales.y,ticks:{...co().scales.y.ticks,callback:v=>'€'+Math.round(v/1000)+'k'}},y:{...co().scales.x,grid:{display:false}}};
+      mkChart('recBotC',{type:'bar',data:{labels:bot.map(x=>`${x.d} ${x.m.substring(0,3)} '${String(x.yr).slice(2)}`),datasets:[{data:bot.map(x=>x.v),backgroundColor:'#ff5a5a33',borderColor:'#ff5a5a',borderWidth:1.5,borderRadius:3,borderSkipped:false}]},options:lOpts});
+    },30);
+  } else if(recS.scope==='week'){
+    const wks=weekTotals(yr).sort((a,b)=>b.v-a.v);
+    if(!wks.length){cont.innerHTML='<div style="padding:1rem;color:var(--muted)">Geen data</div>';return;}
+    const top=wks.slice(0,10); const bot=[...weekTotals(yr)].sort((a,b)=>a.v-b.v).slice(0,5);
+    cont.innerHTML=`
+    <div class="hl-grid"><div class="hl-hi"><div class="hl-label">Hoogste week ${yrBadge(recS.yr)}</div><div class="hl-val">${fmt(top[0].v)}</div><div class="hl-date">${top[0].k} ${yr}</div></div><div class="hl-lo"><div class="hl-label">Laagste week ${yrBadge(recS.yr)}</div><div class="hl-val">${fmt(bot[0].v)}</div><div class="hl-date">${bot[0].k} ${yr}</div></div></div>
+    <div class="panel"><div class="panel-title">Top 10 weken</div><div class="ch" style="height:${10*28+60}px"><canvas id="recWkC" role="img" aria-label="Weken">Weken</canvas></div></div>`;
+    setTimeout(()=>{
+      const o=co(); o.indexAxis='y'; o.scales={x:{...co().scales.y,ticks:{...co().scales.y.ticks,callback:v=>'€'+Math.round(v/1000)+'k'}},y:{...co().scales.x,grid:{display:false}}};
+      mkChart('recWkC',{type:'bar',data:{labels:top.map(x=>x.k+' '+yr),datasets:[{data:top.map(x=>x.v),backgroundColor:cyrc(yr)+'55',borderColor:cyrc(yr),borderWidth:1.5,borderRadius:3,borderSkipped:false}]},options:o});
+    },30);
+  } else {
+    const ms=getMths(yr).map(m=>({m,v:DB[yr][m].total})).sort((a,b)=>b.v-a.v);
+    if(!ms.length){cont.innerHTML='<div style="padding:1rem;color:var(--muted)">Geen data</div>';return;}
+    cont.innerHTML=`
+    <div class="hl-grid"><div class="hl-hi"><div class="hl-label">Hoogste maand ${yrBadge(recS.yr)}</div><div class="hl-val">${fmt(ms[0].v)}</div><div class="hl-date">${ms[0].m} ${yr}</div></div><div class="hl-lo"><div class="hl-label">Laagste maand ${yrBadge(recS.yr)}</div><div class="hl-val">${fmt(ms[ms.length-1].v)}</div><div class="hl-date">${ms[ms.length-1].m} ${yr}</div></div></div>
+    <div class="panel"><div class="panel-title">Maanden gerankt</div><div class="ch" style="height:${ms.length*26+60}px"><canvas id="recMaandC" role="img" aria-label="Maanden">Maanden</canvas></div></div>`;
+    setTimeout(()=>{
+      const o=co(); o.indexAxis='y'; o.scales={x:{...co().scales.y,ticks:{...co().scales.y.ticks,callback:v=>'€'+Math.round(v/1000)+'k'}},y:{...co().scales.x,grid:{display:false}}};
+      const colors=ms.map((x,i)=>i===0?'#22c97a88':i===ms.length-1?'#ff5a5a88':cyrc(yr)+'44');
+      const borders=ms.map((x,i)=>i===0?'#22c97a':i===ms.length-1?'#ff5a5a':cyrc(yr));
+      mkChart('recMaandC',{type:'bar',data:{labels:ms.map(x=>x.m.substring(0,3)),datasets:[{data:ms.map(x=>x.v),backgroundColor:colors,borderColor:borders,borderWidth:1.5,borderRadius:3,borderSkipped:false}]},options:o});
+    },30);
+  }
+}
+
+// ─── WEEKDAG ─────────────────────────────────────────────────────────────────
+const wdS={m:'Januari',wd:1};
+
+function renderWeekdag(){
+  const yrs=getYears();
+  const allM=MONTHS.filter(m=>yrs.some(yr=>DB[yr]?.[m]));
+  const el=document.getElementById('page-weekdag');
+  el.innerHTML=`
+  <div class="page-header"><div><div class="page-title">Weekdagvergelijking</div></div></div>
+  ${pills(allM,wdS.m,'setWdM')}
+  ${pills(WDN,WDN[wdS.wd],'setWdByName')}
+  <div id="wdContent"></div>`;
+  buildWdContent();
+}
+
+function buildWdContent(){
+  const yrs=getYears().filter(yr=>DB[yr]?.[wdS.m]);
+  const jsWd=(wdS.wd+1)%7;
+  function getDates(yr){ const n=getDayCount(yr,wdS.m);const r=[];for(let d=1;d<=n;d++)if(new Date(+yr,MNUM[wdS.m]-1,d).getDay()===jsWd)r.push(d);return r; }
+  const datesByYr=Object.fromEntries(yrs.map(yr=>[yr,getDates(yr)]));
+  const maxOcc=Math.max(...yrs.map(yr=>datesByYr[yr].length),1);
+  const occLabels=Array.from({length:maxOcc},(_,i)=>`#${i+1}`);
+  const datasets=yrs.map(yr=>({label:yr,data:Array.from({length:maxOcc},(_,i)=>{ const d=datesByYr[yr][i]; return d?(DB[yr][wdS.m].days[d]?.[0]||0):null; }),backgroundColor:cyrc(yr),borderRadius:3,borderSkipped:false}));
+
+  const allFeastDates=yrs.flatMap(yr=>datesByYr[yr].map(d=>({yr,d,feast:gf(+yr,wdS.m,d)})).filter(x=>x.feast));
+  const cont=document.getElementById('wdContent');
+  cont.innerHTML=`
+  <div class="legend">${yrs.map(yr=>`<span class="leg-item"><span class="leg-dot" style="background:${cyrc(yr)}"></span>${yr}</span>`).join('')}</div>
+  <div class="panel" style="margin-bottom:12px"><div class="ch" style="height:180px"><canvas id="wdBarC" role="img" aria-label="Weekdag">Weekdag</canvas></div></div>
+  ${allFeastDates.length?`<div style="font-size:10px;color:var(--muted);margin-bottom:12px">${allFeastDates.map(x=>`<span class="badge badge-feast" style="margin-right:4px">${x.d}/${MNUM[wdS.m]} ${x.yr}: ${x.feast}</span>`).join('')}</div>`:''}
+  <div class="panel"><div class="panel-title">Detailtabel</div>
+    <table class="data-table"><thead><tr><th>Voorkomen</th>${yrs.map(yr=>`<th>${yrBadge(yr)} datum</th><th>${yrBadge(yr)} omzet</th>`).join('')}<th>YoY</th></tr></thead>
+    <tbody>${Array.from({length:maxOcc},(_,i)=>{
+      const r25=yrs.includes('2025')?DB['2025']?.[wdS.m]?.days?.[datesByYr['2025']?.[i]]?.[0]||0:0;
+      const r26=yrs.includes('2026')?DB['2026']?.[wdS.m]?.days?.[datesByYr['2026']?.[i]]?.[0]||0:0;
+      const p=r25&&r26?pct(r26,r25):null;
+      return `<tr><td>#${i+1} ${WDN[wdS.wd]}</td>${yrs.map(yr=>{const d=datesByYr[yr][i];const v=d?DB[yr][wdS.m].days[d]?.[0]||0:null;const feast=d?gf(+yr,wdS.m,d):null;return`<td>${d?`${d}/${MNUM[wdS.m]}`:'–'}${feast?` <span class="badge badge-feast">${feast.substring(0,7)}</span>`:''}</td><td class="val">${v!==null?fmt(v):'–'}</td>`;}).join('')}<td class="val ${p!==null?(p>=0?'up':'dn'):''}">${p!==null?ps(p):'–'}</td></tr>`;
+    }).join('')}</tbody></table>
+  </div>`;
+
+  setTimeout(()=>mkChart('wdBarC',{type:'bar',data:{labels:occLabels,datasets},options:{...co(),scales:{y:co().scales.y,x:{...co().scales.x,ticks:{...co().scales.x.ticks,autoSkip:false}}}}}),30);
+}
+
+// ─── MODAL ───────────────────────────────────────────────────────────────────
+
+function parseCSV(txt){
+  const days={}; let tot=0;
+  const tm=txt.match(/Total revenue:;([\d.]+);/); if(tm) tot=parseFloat(tm[1]);
+  const t9=txt.match(/^9%;([\d.]+);/m); const t21=txt.match(/^21%;([\d.]+);/m);
+  const vat9=t9?parseFloat(t9[1]):0; const vat21=t21?parseFloat(t21[1]):0;
+  const tickets=(txt.match(/Total # tickets:;(\d+);/)||[])[1]||0;
+  const pay={cash:0,pin:0,other:0,tips:0};
+  txt.split('\n').forEach(l=>{
+    const p=l.trim().split(';');
+    if(p[0]==='Cash'&&p[4]) pay.cash=parseFloat(p[4])||0;
+    if(p[0]==='Credit Card'&&p[4]) pay.pin=parseFloat(p[4])||0;
+    if(p[0]==='Other'&&p[4]) pay.other=parseFloat(p[4])||0;
+    if(p[0]==='TOTAL'&&p[5]) pay.tips=parseFloat(p[5])||0;
+  });
+  const floors={};
+  let inFloor=false;
+  txt.split('\n').forEach(l=>{
+    if(l.includes('FLOOR REVENUES')){inFloor=true;return;} if(!inFloor) return;
+    const p=l.trim().split(';');
+    if(p[0]&&p[0]!=='FLOOR'&&!p[0].startsWith('-')&&p[1]){try{floors[p[0]]=parseFloat(p[1]);}catch(e){}}
+  });
+  let inDay=false;
+  txt.split('\n').forEach(l=>{
+    if(l.includes('DAY REVENUES')){inDay=true;return;} if(l.includes('FLOOR REVENUES')){inDay=false;return;} if(!inDay) return;
+    const p=l.trim().replace(/;$/,'').split(';');
+    if(p[0]&&/^\d+$/.test(p[0].trim())&&p[4]!==undefined){ const d=parseInt(p[0]); const v=parseFloat(p[4])||0; const t=parseInt(p[3])||0; if(d>=1&&d<=31) days[d]=[v,t]; }
+  });
+  if(!Object.keys(days).length){
+    txt.split('\n').forEach(l=>{ const p=l.trim().split(/[;,\t]/); if(p.length>=2&&/^\d+$/.test(p[0].trim())){ const d=parseInt(p[0]); const v=parseFloat(p[1])||0; if(d>=1&&d<=31) days[d]=[v,0]; } });
+  }
+  if(!tot) tot=Object.values(days).reduce((s,[v])=>s+v,0);
+  return Object.keys(days).length?{total:tot,tickets:parseInt(tickets),vat9,vat21,pay,floors,days}:null;
+}
+
+async function saveModal(){
+  const errEl=document.getElementById('mErr'); errEl.style.display='none';
+  const mode=document.getElementById('mMode').value;
+  if(mode==='month'){
+    const yr=document.getElementById('mYear').value; const m=document.getElementById('mMonth').value;
+    const raw=document.getElementById('mData').value.trim();
+    if(!raw){errEl.textContent='Plak eerst CSV-data.';errEl.style.display='block';return;}
+    const parsed=parseCSV(raw);
+    if(!parsed){errEl.textContent='Kon geen dagomzetten lezen. Controleer het formaat.';errEl.style.display='block';return;}
+    if(!DB[yr]) DB[yr]={}; DB[yr][m]=parsed;
+    // Check conflicts with daylogs
+    if(DAYLOGS[yr]?.[m]){
+      Object.entries(DAYLOGS[yr][m]).forEach(([d,log])=>{
+        const mv=parsed.days[d]?.[0]||0;
+        if(mv>0&&Math.abs(log.rev-mv)>0.5) console.log(`Conflict dag ${d}: log=${log.rev}, maand=${mv}`);
+      });
+    }
+  } else {
+    const yr=document.getElementById('dYear').value; const m=document.getElementById('dMonth').value;
+    const d=parseInt(document.getElementById('dDay').value);
+    const rev=parseFloat(document.getElementById('dRevenue').value);
+    const tick=parseInt(document.getElementById('dTickets').value)||0;
+    if(!d||isNaN(rev)){errEl.textContent='Vul dag en omzet in.';errEl.style.display='block';return;}
+    if(!DAYLOGS[yr]) DAYLOGS[yr]={}; if(!DAYLOGS[yr][m]) DAYLOGS[yr][m]={};
+    DAYLOGS[yr][m][d]={rev,tickets:tick,ts:Date.now()};
+  }
+  saveData(); closeModal(); document.getElementById('mData')&&(document.getElementById('mData').value='');
+  render(curPage);
+}
+
+// ─── RENDER DISPATCHER ───────────────────────────────────────────────────────
+
+
+// ─── EVENEMENTEN PAGE ──────────────────────────────────────────────────────
+const evS={yr:'2026'};
+const EV_KEY_MAP={
+  'Carnaval':'carnaval','Amstel Gold Race':'agr',
+  "Preuvenemint":"preuvenemint","Maastrichts Mooiste":"mooiste","TEFAF":"tefaf"
+};
+
+// ─── EVENEMENTEN PAGE ──────────────────────────────────────────────────────
+const evS={yr:'2026'};
+const WEER_ICON={'zon':'☀️','gedeeltelijk':'⛅','bewolkt':'☁️','regen':'🌧️','onweer':'⛈️','geannuleerd':'🚫','digitaal':'💻','onbekend':'❓'};
+
+
+// ─── EVENEMENTEN PAGE ──────────────────────────────────────────────────────
+const evS={yr:'2026'};
+const EV_KEY_MAP={
+  'Carnaval':'carnaval','Amstel Gold Race':'agr',
+  "Preuvenemint":"preuvenemint","Maastrichts Mooiste":"mooiste","TEFAF":"tefaf"
+};
+function getWeer(evKey,yr){
+  const map=WEERDATA[evKey];
+  return map?map[yr]:null;
+}
+function weerCard(w){
+  if(!w||!w.tmax) return `<span style="color:var(--muted);font-size:11px">${weerIcon(w?.cond||'onbekend')} ${w?.cond||'onbekend'}</span>`;
+  const rColor=w.precip>5?'#60a5fa':w.precip>1?'#94a3b8':'#22c97a';
+  return `<span style="font-size:11px">${weerIcon(w.cond)} ${w.tmax}°<span style="color:var(--muted)">/${w.tmin}°</span> <span style="color:${rColor}">${w.precip}mm</span> <span style="color:var(--muted);font-size:10px">${w.wind}km/h</span></span>`;
+}
+
+function renderEvenementen(){
+  const yrs=getYears();
+  const el=document.getElementById('page-evenementen');
+  el.innerHTML=`
+  <div class="page-header"><div>
+    <div class="page-title">Evenementen &amp; Feestdagen</div>
+    <div class="page-sub">Vergelijking per jaar — omzet &amp; weer — Maastricht</div>
+  </div></div>
+  ${pills(yrs,evS.yr,'setEvYr',true)}
+  <div id="evContent"></div>`;
+  buildEvenementenPage();
+}
+function setEvYr(yr){evS.yr=yr;renderEvenementen();}
+
+function buildEvenementenPage(){
+  const yr=evS.yr;
+  const allYrs=getYears();
+  const evs=(EVENEMENTEN[yr]||[]);
+
+  // ── SECTIE 1: Jaar-op-jaar vergelijking per evenement ──────────────────────
+  const KEY_EVENTS=[
+    {key:'carnaval', label:'Carnaval', wKey:'carnaval', icon:'🎭'},
+    {key:'tefaf',    label:'TEFAF',    wKey:'tefaf',    icon:'🎨'},
+    {key:'agr',      label:'Amstel Gold Race', wKey:'agr', icon:'🚴'},
+    {key:'mooiste',  label:'Maastrichts Mooiste', wKey:'mooiste', icon:'🏃'},
+    {key:'preuvenemint', label:"'t Preuvenemint", wKey:'preuvenemint', icon:'🍽️'},
+  ];
+
+  let html='';
+  KEY_EVENTS.forEach(({key,label,wKey,icon})=>{
+    html+=`<div class="panel" style="margin-bottom:12px">
+      <div class="panel-title">${icon} ${label} — jaar-op-jaar vergelijking</div>
+      <div style="overflow-x:auto">
+      <table class="data-table" style="min-width:700px">
+        <thead><tr>
+          <th>Jaar</th><th>Datum</th><th>Dagomzet</th><th>vs gem. dag</th>
+          <th>Tickets</th><th>Weer</th><th>Conditie</th>
+        </tr></thead>
+        <tbody>`;
+    allYrs.forEach(y=>{
+      const ev=(EVENEMENTEN[y]||[]).find(e=>{
+        if(key==='carnaval') return e.name.includes('Carnaval')&&!e.name.includes('opening');
+        if(key==='agr') return e.name.includes('Amstel Gold');
+        if(key==='preuvenemint') return e.name.includes('Preuvenemint')&&e.impact!=='laag';
+        if(key==='mooiste') return e.name.includes('Mooiste')&&e.impact!=='laag';
+        if(key==='tefaf') return e.name.includes('TEFAF')&&e.impact!=='laag';
+        return false;
+      });
+      const w=getWeer(wKey,y);
+      const dagRev=ev&&DB[y]?.[ev.m]?.days?.[ev.s]?.[0]||0;
+      const dagTix=ev&&DB[y]?.[ev.m]?.days?.[ev.s]?.[1]||0;
+      const avgRev=ev?avgDayRev(y,ev.m):0;
+      const diff=avgRev>0&&dagRev>0?pct(dagRev,avgRev):null;
+      const isThisYr=y===yr;
+      const dateStr=ev?`${ev.s}/${MNUM[ev.m]}`:w?.date?.substring(5)||'–';
+      const annul=ev?.name?.includes('geann')||ev?.name?.includes('zonder')||ev?.impact==='laag';
+      html+=`<tr style="${isThisYr?'background:var(--cream)':''}">
+        <td>${yrBadge(y)}</td>
+        <td style="font-size:10px;color:var(--text2)">${dateStr}</td>
+        <td class="val" style="color:${dagRev>0?(diff!==null&&diff>0?'var(--green)':'var(--text)'):'var(--text3)'}">${dagRev>0?fmt(dagRev):annul?'<span style="color:var(--red)">geannuleerd</span>':'<span style="color:var(--muted)">geen data</span>'}</td>
+        <td class="val ${diff!==null?(diff>=0?'up':'dn'):''}">${diff!==null?ps(diff):'–'}</td>
+        <td class="val">${dagTix>0?dagTix+'x':'–'}</td>
+        <td style="font-size:11px;white-space:nowrap">${w?weerCard(w):'–'}</td>
+        <td style="font-size:10px;color:var(--text2)">${w?.cond||'–'}</td>
+      </tr>`;
+    });
+    html+=`</tbody></table></div></div>`;
+  });
+
+  // ── SECTIE 2: Kalenderoverzicht huidig jaar ────────────────────────────────
+  const MONTHS_FULL=['Januari','Februari','Maart','April','Mei','Juni','Juli','Augustus','September','Oktober','November','December'];
+  const MONTH_COLS=['Jan','Feb','Mrt','Apr','Mei','Jun','Jul','Aug','Sep','Okt','Nov','Dec'];
+  let kalHtml=`<div class="panel" style="margin-bottom:12px">
+    <div class="panel-title">Evenementenkalender ${yrBadge(yr)}</div>
+    <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:6px">`;
+  MONTHS_FULL.forEach((m,mi)=>{
+    const mEvs=evs.filter(e=>e.m===m);
+    const mFeasts=(FEASTS[+yr]?.[m]||[]);
+    const hasHoog=mEvs.some(e=>e.impact==='hoog');
+    const hasMid=mEvs.some(e=>e.impact==='midden');
+    const bg=hasHoog?'rgba(244,114,182,.12)':hasMid?'rgba(52,211,153,.08)':'var(--bg3)';
+    const border=hasHoog?'1px solid rgba(244,114,182,.3)':hasMid?'1px solid rgba(52,211,153,.25)':'1px solid var(--border)';
+    kalHtml+=`<div style="background:${bg};border:${border};border-radius:8px;padding:8px 10px;min-height:70px">
+      <div style="font-size:10px;font-weight:600;color:var(--text2);margin-bottom:5px">${MONTH_COLS[mi]}</div>
+      ${mFeasts.map(f=>`<div style="font-size:9px;color:#fbbf24;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">⭐ ${f.d}/${mi+1} ${f.n}</div>`).join('')}
+      ${mEvs.map(e=>`<div style="font-size:9px;color:${EV_COLORS[e.type]||'#34d399'};margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${e.type==='carnaval'?'🎭':'📍'} ${e.s}${e.s!==e.e?'–'+e.e:''}/${mi+1} ${e.name.substring(0,12)}</div>`).join('')}
+    </div>`;
+  });
+  kalHtml+=`</div></div>`;
+
+  // ── SECTIE 3: Omzet-grafiek evenementdagen vs gemiddeld ────────────────────
+  const evWithRev=evs.filter(e=>DB[yr]?.[e.m]?.days?.[e.s]?.[0]>0);
+  const allDayRevs=Object.values(DB[yr]||{}).flatMap(m=>Object.values(m.days).filter(([v])=>v>0).map(([v])=>v));
+  const avgAll=allDayRevs.length?allDayRevs.reduce((a,b)=>a+b,0)/allDayRevs.length:0;
+  const graphHtml=`
+  <div class="panels p2">
+    <div class="panel"><div class="panel-title">Omzet evenementdagen ${yrBadge(yr)} vs daggemiddelde</div>
+      <div class="ch" style="height:200px"><canvas id="evBarC" role="img" aria-label="Evenement omzet">Evenementen</canvas></div>
+    </div>
+    <div class="panel"><div class="panel-title">Weer-impact: Preuvenemint temperatuur per jaar</div>
+      <div class="ch" style="height:200px"><canvas id="evWeerC" role="img" aria-label="Weer">Weer</canvas></div>
+    </div>
+  </div>`;
+
+  document.getElementById('evContent').innerHTML=html+kalHtml+graphHtml;
+
+  // Charts
+  if(evWithRev.length){
+    setTimeout(()=>{
+      const labels=evWithRev.map(e=>e.name.substring(0,14));
+      const vals=evWithRev.map(e=>DB[yr][e.m].days[e.s][0]);
+      const colors=evWithRev.map(e=>e.impact==='hoog'?'rgba(244,114,182,.7)':'rgba(52,211,153,.7)');
+      mkChart('evBarC',{type:'bar',data:{labels,datasets:[
+        {label:'Omzet op dag',data:vals,backgroundColor:colors,borderRadius:4,borderSkipped:false},
+        {label:`Gem. dagomzet ${yr}`,data:labels.map(()=>avgAll),type:'line',borderColor:'#94a3b8',borderWidth:1.5,borderDash:[4,4],pointRadius:0,backgroundColor:'transparent'}
+      ]},options:{...co(),scales:{y:co().scales.y,x:{...co().scales.x,ticks:{...co().scales.x.ticks,font:{size:9},maxRotation:40}}}}});
+    },30);
+  }
+
+  // Weer-chart: max temp voor alle key-events door de jaren
+  setTimeout(()=>{
+    const weerYrs=getYears();
+    const weerKeys=[
+      {label:'Carnaval',key:'carnaval',color:'#f472b6'},
+      {label:'AGR',key:'agr',color:'#34d399'},
+      {label:"Preuvenemint",key:'preuvenemint',color:'#fb923c'},
+      {label:'Mooiste',key:'mooiste',color:'#60a5fa'},
+    ];
+    const wDS=weerKeys.map(({label,key,color})=>({
+      label,
+      data:weerYrs.map(y=>WEERDATA[key]?.[y]?.tmax||null),
+      borderColor:color,backgroundColor:color+'22',fill:false,tension:.3,
+      pointRadius:5,borderWidth:2,spanGaps:false,
+      pointBackgroundColor:weerYrs.map(y=>{
+        const w=WEERDATA[key]?.[y];
+        return w?.cond==='regen'?'#ff5a5a':w?.cond==='zon'?'#fbbf24':color;
+      })
+    }));
+    const opts=co();opts.scales.y.ticks.callback=v=>v+'°C';
+    mkChart('evWeerC',{type:'line',data:{labels:weerYrs,datasets:wDS},options:{...opts,plugins:{...opts.plugins,legend:{display:true,labels:{color:'#7A7A6E',font:{size:10},boxWidth:10,boxHeight:10}}},scales:{...opts.scales,x:{...opts.scales.x,ticks:{...opts.scales.x.ticks,autoSkip:false}}}}});
+  },60);
+}
+
+
+
+
+// ─── RENDER DISPATCHER ───────────────────────────────────────────────────────
+const RENDERERS={
+  overzicht:renderOverzicht, dag:renderDag, week:renderWeek, maand:renderMaand,
+  vloer:renderVloer, betaling:renderBetaling, vat:renderVat,
+  evenementen:renderEvenementen, feest:renderFeest, prognose:renderPrognose,
+  daglog:renderDaglog, records:renderRecords, weekdag:renderWeekdag
+};
+function render(p){if(RENDERERS[p])RENDERERS[p]();}
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+const nd=document.getElementById('navDate');
+if(nd) nd.textContent=new Date().toLocaleDateString('nl-NL',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
+initDashboard();
+
+// ── FULLSCREEN CHART ──────────────────────────────────────────────────────
+let fsChartInst=null;
+let fsRegistry={};  // id -> {cfg, title, statsBuilder, tableBuilder}
+
+function regFs(id, title, statsBuilder, tableBuilder){
+  fsRegistry[id]={title, statsBuilder, tableBuilder};
+}
+
+function openFs(id){
+  const entry=fsRegistry[id];
+  if(!entry) return;
+  const srcChart=CHARTS[id];
+  if(!srcChart) return;
+
+  document.getElementById('fsTitle').textContent=entry.title;
+  document.getElementById('fsOverlay').classList.add('open');
+  document.body.style.overflow='hidden';
+
+  // Stats
+  const stats=entry.statsBuilder ? entry.statsBuilder() : [];
+  document.getElementById('fsStats').innerHTML=stats.map(s=>
+    `<div class="fs-stat"><div class="fs-stat-label">${s.label}</div><div class="fs-stat-val">${s.val}</div><div class="fs-stat-sub">${s.sub||''}</div></div>`
+  ).join('');
+
+  // Table
+  const tableData=entry.tableBuilder ? entry.tableBuilder() : null;
+  if(tableData){
+    document.querySelector('#fsTable thead').innerHTML='<tr>'+tableData.headers.map(h=>`<th>${h}</th>`).join('')+'</tr>';
+    document.querySelector('#fsTable tbody').innerHTML=tableData.rows.map(r=>'<tr>'+r.map((c,i)=>`<td class="${i>0?'val':''}">${c}</td>`).join('')+'</tr>').join('');
+  } else {
+    document.querySelector('#fsTable thead').innerHTML='';
+    document.querySelector('#fsTable tbody').innerHTML='';
+  }
+
+  // Clone chart config for fullscreen
+  if(fsChartInst){fsChartInst.destroy();fsChartInst=null;}
+  setTimeout(()=>{
+    const cfg=JSON.parse(JSON.stringify(srcChart.config));
+    // Make fullscreen version bigger and more readable
+    if(cfg.options?.scales?.x?.ticks) cfg.options.scales.x.ticks.font={size:11};
+    if(cfg.options?.scales?.y?.ticks) cfg.options.scales.y.ticks.font={size:11};
+    if(cfg.options?.plugins?.legend) cfg.options.plugins.legend.display=true;
+    cfg.options.responsive=true; cfg.options.maintainAspectRatio=false;
+    // Show full labels on x axis
+    if(cfg.options?.scales?.x?.ticks) cfg.options.scales.x.ticks.autoSkip=false;
+    // Bigger point radius
+    cfg.data.datasets.forEach(ds=>{if(ds.pointRadius!==undefined)ds.pointRadius=4;});
+    fsChartInst=new Chart(document.getElementById('fsChart'), cfg);
+  },50);
+}
+
+function closeFs(){
+  document.getElementById('fsOverlay').classList.remove('open');
+  document.body.style.overflow='';
+  if(fsChartInst){fsChartInst.destroy();fsChartInst=null;}
+}
+
+function fsClickOutside(e){
+  if(e.target===document.getElementById('fsOverlay')) closeFs();
+}
+
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeFs(); });
+
+// Helper to make a panel clickable
+function makeClickable(canvasId, title, statsBuilder, tableBuilder){
+  regFs(canvasId, title, statsBuilder, tableBuilder);
+  const el=document.getElementById(canvasId);
+  if(!el) return;
+  const wrap=el.closest('.ch');
+  if(wrap){
+    wrap.classList.add('ch-clickable');
+    wrap.onclick=()=>openFs(canvasId);
+    // Add hint if not already there
+    if(!wrap.nextElementSibling?.classList.contains('ch-hint')){
+      const hint=document.createElement('div');
+      hint.className='ch-hint';
+      hint.textContent='klik om te vergroten';
+      wrap.after(hint);
+    }
+  }
+}
+
+// ── REGISTER CHARTS AFTER RENDER ─────────────────────────────────────────
+// We hook into mkChart to auto-register every chart
+const _origMkChart = mkChart;
+function mkChart(id, cfg){
+  _origMkChart(id, cfg);
+  // Auto-register with a basic title derived from the canvas aria-label
+  const el=document.getElementById(id);
+  const title=el?.getAttribute('aria-label')||id;
+  regFs(id, title, null, null);
+  const wrap=el?.closest('.ch');
+  if(wrap){
+    wrap.classList.add('ch-clickable');
+    wrap.onclick=()=>openFsEnriched(id);
+    if(!wrap.nextElementSibling?.classList.contains('ch-hint')){
+      const hint=document.createElement('div');
+      hint.className='ch-hint';
+      hint.textContent='klik om te vergroten';
+      wrap.parentNode?.insertBefore(hint, wrap.nextSibling);
+    }
+  }
+}
+
+function openFsEnriched(id){
+  const srcChart=CHARTS[id];
+  if(!srcChart) return;
+  const entry=fsRegistry[id]||{};
+  const yrs=getYears();
+
+  document.getElementById('fsTitle').textContent=entry.title||srcChart.config.options?.plugins?.title?.text||id;
+  document.getElementById('fsOverlay').classList.add('open');
+  document.body.style.overflow='hidden';
+
+  // ── Build contextual stats based on chart id ──────────────────────────
+  let stats=[], tableData=null;
+
+  if(id==='ovMaandC'||id==='maandLineC'){
+    stats=yrs.map(yr=>{
+      const tot=getMths(yr).reduce((s,m)=>s+DB[yr][m].total,0);
+      const prev=DB[String(+yr-1)];
+      const prevTot=prev?Object.values(prev).reduce((s,m)=>s+m.total,0):null;
+      const p=prevTot?pct(tot,prevTot):null;
+      return {label:`Totaal ${yr}`,val:fmt(tot),sub:p!==null?ps(p)+' vs '+(+yr-1):'-'};
+    });
+    tableData={
+      headers:['Maand',...yrs],
+      rows:['Januari','Februari','Maart','April','Mei','Juni','Juli','Augustus','September','Oktober','November','December'].map(m=>[
+        m,...yrs.map(yr=>DB[yr]?.[m]?fmt(DB[yr][m].total):'–')
+      ])
+    };
+  } else if(id==='ovWeekC'||id==='weekLineC'){
+    stats=yrs.slice(-3).map(yr=>{
+      const wks=weekTotals(yr);
+      const hi=wks.length?wks.reduce((a,b)=>a.v>b.v?a:b):{k:'–',v:0};
+      const lo=wks.length?wks.reduce((a,b)=>a.v<b.v?a:b):{k:'–',v:0};
+      return {label:`${yr} beste week`,val:hi.k,sub:fmt(hi.v)};
+    });
+  } else if(id==='dagC'){
+    const m=dagS.m; const activeYrs=yrs.filter(yr=>DB[yr]?.[m]);
+    stats=activeYrs.map(yr=>{
+      const days=Object.values(DB[yr][m].days).filter(([v])=>v>0);
+      const tot=days.reduce((s,[v])=>s+v,0);
+      const hi=days.reduce((a,b)=>a[0]>b[0]?a:b,[0,0]);
+      return {label:`Totaal ${yr} ${m}`,val:fmt(tot),sub:`Beste dag: ${fmt(hi[0])}`};
+    });
+    tableData={
+      headers:['Dag',...activeYrs.map(yr=>yr+' omzet'),...activeYrs.map(yr=>yr+' tickets'),'Feestdag/Vakantie'],
+      rows:Array.from({length:31},(_,i)=>i+1).filter(d=>activeYrs.some(yr=>DB[yr]?.[m]?.days[d]?.[0]>0)).map(d=>[
+        d+'/'+(MNUM[m]||'?'),
+        ...activeYrs.map(yr=>DB[yr]?.[m]?.days[d]?.[0]>0?fmt(DB[yr][m].days[d][0]):'–'),
+        ...activeYrs.map(yr=>DB[yr]?.[m]?.days[d]?.[1]>0?DB[yr][m].days[d][1]+'x':'–'),gf(activeYrs[0]||'2026',m,d)||isVak(activeYrs[0]||'2026',m,d)||'–',
+      ])
+    };
+  } else if(id==='vatBarC'||id==='vatRatioC'){
+    const ms=getMths(vatS.yr);
+    const v9t=ms.reduce((s,m)=>s+(DB[vatS.yr][m]?.vat9||0),0);
+    const v21t=ms.reduce((s,m)=>s+(DB[vatS.yr][m]?.vat21||0),0);
+    stats=[
+      {label:'Totaal 9% eten',val:fmt(v9t),sub:(v9t/(v9t+v21t)*100).toFixed(1)+'% van netto'},
+      {label:'Totaal 21% drank',val:fmt(v21t),sub:(v21t/(v9t+v21t)*100).toFixed(1)+'% van netto'},
+      {label:'Eten/drank ratio',val:(v9t/v21t).toFixed(2),sub:'eten gedeeld door drank'},
+      {label:'Gem. drank/maand',val:fmt(v21t/ms.length),sub:'netto'},
+    ];
+    tableData={
+      headers:['Maand','9% eten','21% drank','Drank%'],
+      rows:ms.map(m=>{const v9=DB[vatS.yr][m]?.vat9||0;const v21=DB[vatS.yr][m]?.vat21||0;const tot=v9+v21;return[m,fmt(v9),fmt(v21),tot>0?(v21/tot*100).toFixed(1)+'%':'–'];})
+    };
+  } else if(id==='betBarC'||id==='betTipsC'){
+    const ms=getMths(betS.yr);
+    const pinT=ms.reduce((s,m)=>s+(DB[betS.yr][m]?.pay?.pin||0),0);
+    const cashT=ms.reduce((s,m)=>s+(DB[betS.yr][m]?.pay?.cash||0),0);
+    const tipsT=ms.reduce((s,m)=>s+(DB[betS.yr][m]?.pay?.tips||0),0);
+    const totT=ms.reduce((s,m)=>s+DB[betS.yr][m].total,0);
+    stats=[
+      {label:'Totaal pin',val:fmt(pinT),sub:(pinT/totT*100).toFixed(1)+'% van omzet'},
+      {label:'Totaal cash',val:fmt(Math.max(0,cashT)),sub:(Math.max(0,cashT)/totT*100).toFixed(1)+'% van omzet'},
+      {label:'Totaal fooi',val:fmt(tipsT),sub:(tipsT/totT*100).toFixed(1)+'% van omzet'},
+      {label:'Gem. fooi/maand',val:fmt(tipsT/ms.length),sub:''},
+    ];
+    tableData={
+      headers:['Maand','Totaal','Pin','Cash','Fooi','Fooi%'],
+      rows:ms.map(m=>{const d=DB[betS.yr][m];const p=d.pay||{};const tp=d.total>0?(p.tips||0)/d.total*100:0;return[m,fmt(d.total),fmt(p.pin||0),fmt(Math.max(0,p.cash||0)),fmt(p.tips||0),tp.toFixed(1)+'%'];})
+    };
+  } else if(id==='vloerLineC'||id==='vloerDonutC'){
+    const ms=getMths(vloerS.yr);
+    const floors=['Boschstraat','Markt','Restaurant','Intern'];
+    stats=floors.map(fl=>{const tot=ms.reduce((s,m)=>s+(DB[vloerS.yr][m]?.floors?.[fl]||0),0);return{label:fl,val:fmt(tot),sub:''};});
+    const grandTot=stats.reduce((s,x)=>s+(parseFloat(x.val.replace(/[€.]/g,'').replace(',','.'))||0),0);
+    tableData={
+      headers:['Maand',...floors,'Totaal'],
+      rows:ms.map(m=>{const fs=floors.map(fl=>DB[vloerS.yr][m]?.floors?.[fl]||0);const tot=fs.reduce((a,b)=>a+b,0);return[m,...fs.map(fmt),fmt(tot)];})
+    };
+  } else if(id==='maandGrowthC'){
+    const growthMs=getMths('2026');
+    stats=growthMs.map(m=>{const p=pct(DB['2026'][m]?.total||0,DB['2025']?.[m]?.total||0);return{label:m,val:p!==null?ps(p):'–',sub:`${fmt(DB['2026'][m]?.total||0)} vs ${fmt(DB['2025']?.[m]?.total||0)}`};});
+  } else {
+    // Generic stats: total per year
+    stats=yrs.slice(-4).map(yr=>{const tot=getMths(yr).reduce((s,m)=>s+DB[yr][m].total,0);return{label:'Totaal '+yr,val:fmt(tot),sub:getMths(yr).length+' maanden'};});
+  }
+
+  document.getElementById('fsStats').innerHTML=stats.slice(0,4).map(s=>
+    `<div class="fs-stat"><div class="fs-stat-label">${s.label}</div><div class="fs-stat-val">${s.val}</div><div class="fs-stat-sub">${s.sub||''}</div></div>`
+  ).join('');
+
+  if(tableData){
+    document.querySelector('#fsTable thead').innerHTML='<tr>'+tableData.headers.map(h=>`<th>${h}</th>`).join('')+'</tr>';
+    document.querySelector('#fsTable tbody').innerHTML=tableData.rows.map(r=>'<tr>'+r.map((c,i)=>`<td class="${i>0?'val':''}">${c}</td>`).join('')+'</tr>').join('');
+  } else {
+    document.querySelector('#fsTable thead').innerHTML='';
+    document.querySelector('#fsTable tbody').innerHTML='';
+  }
+
+  // Clone + render chart
+  if(fsChartInst){fsChartInst.destroy();fsChartInst=null;}
+  setTimeout(()=>{
+    try{
+      const cfgStr=JSON.stringify({type:srcChart.config.type,data:srcChart.config.data,options:srcChart.config.options});
+      const cfg=JSON.parse(cfgStr);
+      cfg.options=cfg.options||{};
+      cfg.options.responsive=true;
+      cfg.options.maintainAspectRatio=false;
+      // Bigger fonts
+      const setFont=(obj)=>{if(obj&&typeof obj==='object'){if(obj.ticks)obj.ticks.font={size:12,family:'sans-serif'};Object.values(obj).forEach(setFont);}};
+      setFont(cfg.options?.scales||{});
+      // Show legend
+      if(!cfg.options.plugins) cfg.options.plugins={};
+      cfg.options.plugins.legend={display:true,labels:{color:'#7A7A6E',font:{size:11,family:'sans-serif'},boxWidth:12,boxHeight:12,padding:16}};
+      // Remove vline plugin issues
+      if(cfg.options.plugins.vl) delete cfg.options.plugins.vl;
+      // Bigger points
+      (cfg.data?.datasets||[]).forEach(ds=>{if(ds.pointRadius!==undefined)ds.pointRadius=4;if(ds.borderWidth)ds.borderWidth=2;});
+      fsChartInst=new Chart(document.getElementById('fsChart'),cfg);
+    }catch(e){console.error('FS chart error:',e);}
+  },60);
+}
+
+
+</script>
+
+<div class="fs-overlay" id="fsOverlay" onclick="if(event.target===this)closeFs()">
+  <div class="fs-modal">
+    <div class="fs-header"><div class="fs-title" id="fsTitle">Grafiek</div><button class="fs-close" onclick="closeFs()">&#x2715;</button></div>
+    <div class="fs-body">
+      <div class="fs-stats" id="fsStats"></div>
+      <div class="fs-chart-wrap"><canvas id="fsChart"></canvas></div>
+      <div class="fs-table-wrap"><table class="fs-table" id="fsTable"><thead></thead><tbody></tbody></table></div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
