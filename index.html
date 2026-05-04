@@ -1201,24 +1201,6 @@ async function saveModal(){
 // ─── RENDER DISPATCHER ───────────────────────────────────────────────────────
 
 
-// ─── EVENEMENTEN PAGE ──────────────────────────────────────────────────────
-const evS={yr:'2026'};
-const EV_KEY_MAP={
-  'Carnaval':'carnaval','Amstel Gold Race':'agr',
-  "Preuvenemint":"preuvenemint","Maastrichts Mooiste":"mooiste","TEFAF":"tefaf"
-};
-
-// ─── EVENEMENTEN PAGE ──────────────────────────────────────────────────────
-const evS={yr:'2026'};
-const WEER_ICON={'zon':'☀️','gedeeltelijk':'⛅','bewolkt':'☁️','regen':'🌧️','onweer':'⛈️','geannuleerd':'🚫','digitaal':'💻','onbekend':'❓'};
-
-
-// ─── EVENEMENTEN PAGE ──────────────────────────────────────────────────────
-const evS={yr:'2026'};
-const EV_KEY_MAP={
-  'Carnaval':'carnaval','Amstel Gold Race':'agr',
-  "Preuvenemint":"preuvenemint","Maastrichts Mooiste":"mooiste","TEFAF":"tefaf"
-};
 function getWeer(evKey,yr){
   const map=WEERDATA[evKey];
   return map?map[yr]:null;
@@ -1228,6 +1210,10 @@ function weerCard(w){
   const rColor=w.precip>5?'#60a5fa':w.precip>1?'#94a3b8':'#22c97a';
   return `<span style="font-size:11px">${weerIcon(w.cond)} ${w.tmax}°<span style="color:var(--muted)">/${w.tmin}°</span> <span style="color:${rColor}">${w.precip}mm</span> <span style="color:var(--muted);font-size:10px">${w.wind}km/h</span></span>`;
 }
+
+// ─── EVENEMENTEN STATE ───────────────────────────────────────────────────────
+const evS={yr:'2026'};
+const EV_KEY_MAP={'Carnaval':'carnaval','Amstel Gold Race':'agr','Preuvenemint':'preuvenemint','Maastrichts Mooiste':'mooiste','TEFAF':'tefaf'};
 
 function renderEvenementen(){
   const yrs=getYears();
